@@ -15,6 +15,9 @@ public class LessonTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @Column(name = "schedule_template_id")
+    private long ScheduleTemplateId;
+    private long groupId;
     private long lessonId;
     private long time;
 
