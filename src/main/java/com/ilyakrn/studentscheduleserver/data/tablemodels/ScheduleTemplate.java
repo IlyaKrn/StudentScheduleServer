@@ -20,7 +20,7 @@ public class ScheduleTemplate {
     private long groupId;
     @Column(name = "name")
     private String name;
-    @Column(name = "time_stop")
+    @Column(name = "time_start")
     private long timeStart;
     @Column(name = "time_stop")
     private long timeStop;
