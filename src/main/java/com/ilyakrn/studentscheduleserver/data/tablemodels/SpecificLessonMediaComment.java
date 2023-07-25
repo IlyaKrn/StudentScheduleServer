@@ -17,6 +17,7 @@ public class SpecificLessonMediaComment {
     private long id;
     private String text;
     private long authorId;
-    private long mediaId;
+    @Column(name = "specific_lesson_media_id")
+    private long specificLessonMediaId;
     private long questionCommentId;
 }

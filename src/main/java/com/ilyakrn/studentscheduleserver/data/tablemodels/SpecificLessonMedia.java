@@ -16,6 +16,8 @@ public class SpecificLessonMedia {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @Column(name = "specific_lesson_id")
+    private long specificLessonId;
     private String url;
     @ElementCollection
     private List<SpecificLessonMediaComment> comments;

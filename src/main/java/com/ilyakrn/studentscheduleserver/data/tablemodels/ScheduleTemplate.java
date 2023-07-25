@@ -15,6 +15,8 @@ public class ScheduleTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @Column(name = "group_id")
+    private long groupId;
     private String name;
     private long timeStart;
     private long timeStop;

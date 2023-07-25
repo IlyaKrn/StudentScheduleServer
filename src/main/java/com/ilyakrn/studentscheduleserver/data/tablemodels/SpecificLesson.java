@@ -15,6 +15,8 @@ public class SpecificLesson {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @Column(name = "group_id")
+    private long groupId;
     private long lessonId;
     private long time;
     private boolean canceled;
