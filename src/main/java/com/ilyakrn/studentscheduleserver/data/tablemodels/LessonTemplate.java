@@ -14,11 +14,15 @@ public class LessonTemplate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private long id;
     @Column(name = "schedule_template_id")
-    private long ScheduleTemplateId;
+    private long scheduleTemplateId;
+    @Column(name = "group_id")
     private long groupId;
+    @Column(name = "lesson_id")
     private long lessonId;
+    @Column(name = "time")
     private long time;
 
 }
