@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "specific_lesson_medias")
 public class SpecificLessonMedia {
 
     @Id
@@ -21,7 +22,7 @@ public class SpecificLessonMedia {
     private long specificLessonId;
     @Column(name = "url")
     private String url;
-    @ElementCollection
-    private List<SpecificLessonMediaComment> comments;
+ //   @ElementCollection
+ //   private List<SpecificLessonMediaComment> comments;
 
 }

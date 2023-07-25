@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "specific_lessons")
 public class SpecificLesson {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,7 +25,7 @@ public class SpecificLesson {
     private long time;
     @Column(name = "canceled")
     private boolean canceled;
-    @ElementCollection
-    private List<SpecificLessonMedia> specificLessonMedias;
+  //  @ElementCollection
+  //  private List<SpecificLessonMedia> specificLessonMedias;
 
 }

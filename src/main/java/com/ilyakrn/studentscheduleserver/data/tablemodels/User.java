@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id
@@ -27,7 +28,7 @@ public class User {
     private String lastName;
     @Column(name = "banned")
     private boolean banned;
-    @ElementCollection
-    private List<Role> roles;
+  //  @ElementCollection
+  //  private List<Role> roles;
 
 }

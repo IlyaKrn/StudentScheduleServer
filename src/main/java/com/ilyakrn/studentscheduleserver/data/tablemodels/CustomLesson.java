@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "custom_lessons")
 public class CustomLesson {
 
     @Id

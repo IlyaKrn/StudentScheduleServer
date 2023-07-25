@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "schedule_templates")
 public class ScheduleTemplate {
 
     @Id
@@ -24,7 +25,7 @@ public class ScheduleTemplate {
     private long timeStart;
     @Column(name = "time_stop")
     private long timeStop;
-    @ElementCollection
-    private List<LessonTemplate> lessonTemplates;
+   // @ElementCollection
+   // private List<LessonTemplate> lessonTemplates;
 
 }

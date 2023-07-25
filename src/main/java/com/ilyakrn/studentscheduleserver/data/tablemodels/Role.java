@@ -2,6 +2,9 @@ package com.ilyakrn.studentscheduleserver.data.tablemodels;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 @RequiredArgsConstructor
 public enum Role implements GrantedAuthority {
     USER, ADMIN, ULTIMATE;

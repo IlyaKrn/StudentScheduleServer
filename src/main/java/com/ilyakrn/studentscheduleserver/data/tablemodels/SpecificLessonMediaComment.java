@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "specific_lesson_media_comments")
 public class SpecificLessonMediaComment {
 
     @Id
