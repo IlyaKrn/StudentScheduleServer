@@ -5,6 +5,8 @@ import com.ilyakrn.studentscheduleserver.data.tablemodels.SpecificLessonMedia;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("api/specificLessonMedias")
 public class SpecificLessonMediaController {
@@ -27,7 +29,7 @@ public class SpecificLessonMediaController {
         return null;
     }
     @GetMapping("{id}/specificLessonMediaComments")
-    public ResponseEntity<Long> specificLessonMediaComments(@PathVariable("id") long id){
+    public ResponseEntity<ArrayList<Long>> specificLessonMediaComments(@PathVariable("id") long id){
         return null;
     }
 

@@ -5,6 +5,8 @@ import com.ilyakrn.studentscheduleserver.data.tablemodels.SpecificLesson;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("api/specificLessons")
 public class SpecificLessonController {
@@ -27,7 +29,7 @@ public class SpecificLessonController {
         return null;
     }
     @GetMapping("{id}/specificLessonMedias")
-    public ResponseEntity<Long> specificLessonMedias(@PathVariable("id") long id){
+    public ResponseEntity<ArrayList<Long>> specificLessonMedias(@PathVariable("id") long id){
         return null;
     }
 

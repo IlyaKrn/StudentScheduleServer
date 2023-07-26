@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("api/users")
 public class UserController {
@@ -60,12 +62,12 @@ public class UserController {
     }
 
     @GetMapping("{id}/groups")
-    public ResponseEntity<Long> groups(@PathVariable("id") long id){
+    public ResponseEntity<ArrayList<Long>> groups(@PathVariable("id") long id){
         return null;
     }
 
     @GetMapping("{id}/specificLessonMediaComments")
-    public ResponseEntity<Long> specificLessonMediaComments(@PathVariable("id") long id){
+    public ResponseEntity<ArrayList<Long>> specificLessonMediaComments(@PathVariable("id") long id){
         return null;
     }
 

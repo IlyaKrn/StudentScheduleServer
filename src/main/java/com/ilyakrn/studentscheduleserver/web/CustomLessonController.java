@@ -5,6 +5,8 @@ import com.ilyakrn.studentscheduleserver.data.tablemodels.Member;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("api/customLessons")
 public class CustomLessonController {
@@ -27,11 +29,11 @@ public class CustomLessonController {
         return null;
     }
     @GetMapping("{id}/lessonTemplates")
-    public ResponseEntity<Long> lessonTemplates(@PathVariable("id") long id){
+    public ResponseEntity<ArrayList<Long>> lessonTemplates(@PathVariable("id") long id){
         return null;
     }
     @GetMapping("{id}/specificLessons")
-    public ResponseEntity<Long> specificLessons(@PathVariable("id") long id){
+    public ResponseEntity<ArrayList<Long>> specificLessons(@PathVariable("id") long id){
         return null;
     }
 

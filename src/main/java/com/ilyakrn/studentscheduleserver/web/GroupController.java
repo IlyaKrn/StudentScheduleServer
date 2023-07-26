@@ -17,15 +17,17 @@ import java.util.Comparator;
 public class GroupController {
 
     @Autowired
-    GroupRepository groupRepository;
+    private GroupRepository groupRepository;
     @Autowired
-    MemberRepository memberRepository;
+    private MemberRepository memberRepository;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    CustomLessonRepository customLessonRepository;
+    private CustomLessonRepository customLessonRepository;
     @Autowired
-    ScheduleTemplateRepository scheduleTemplateRepository;
+    private ScheduleTemplateRepository scheduleTemplateRepository;
+    @Autowired
+    private SpecificLessonRepository specificLessonRepository;
 
     @GetMapping("{id}")
     public ResponseEntity<Group> get(@PathVariable("id") long id){
@@ -136,13 +138,51 @@ public class GroupController {
 
 
     @GetMapping("{id}/scheduleTemplates")
-    public ResponseEntity<Long> scheduleTemplates(@PathVariable("id") long id){
-        return null;
+    public ResponseEntity<ArrayList<Long>> scheduleTemplates(@PathVariable("id") long id){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!userRepository.existsByEmail(auth.getName()))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if(!groupRepository.existsById(id))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<ScheduleTemplate> sts = (ArrayList<ScheduleTemplate>) scheduleTemplateRepository.findScheduleTemplateByGroupId(id).get();
+        ArrayList<Long> ids = new ArrayList<>();
+        for (ScheduleTemplate st : sts){
+            ids.add(st.getId());
+        }
+        for(Member m : memberRepository.findMemberByGroupId(id).get()){
+            if(u.getId() == m.getUserId()){
+                return ResponseEntity.ok(ids);
+            }
+        }
+        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+            return ResponseEntity.ok(ids);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
     }
 
     @GetMapping("{id}/specificLessons")
-    public ResponseEntity<Long> specificLessons(@PathVariable("id") long id){
-        return null;
+    public ResponseEntity<ArrayList<Long>> specificLessons(@PathVariable("id") long id){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!userRepository.existsByEmail(auth.getName()))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if(!groupRepository.existsById(id))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<SpecificLesson> sls = (ArrayList<SpecificLesson>) specificLessonRepository.findSpecificLessonByGroupId(id).get();
+        ArrayList<Long> ids = new ArrayList<>();
+        for (SpecificLesson sl : sls){
+            ids.add(sl.getId());
+        }
+        for(Member m : memberRepository.findMemberByGroupId(id).get()){
+            if(u.getId() == m.getUserId()){
+                return ResponseEntity.ok(ids);
+            }
+        }
+        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+            return ResponseEntity.ok(ids);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
     }
 
 

@@ -6,6 +6,8 @@ import com.ilyakrn.studentscheduleserver.data.tablemodels.ScheduleTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("api/scheduleTemplates")
 public class ScheduleTemplateController {
@@ -28,7 +30,7 @@ public class ScheduleTemplateController {
         return null;
     }
     @GetMapping("{id}/lessonTemplates")
-    public ResponseEntity<Long> lessonTemplates(@PathVariable("id") long id){
+    public ResponseEntity<ArrayList<Long>> lessonTemplates(@PathVariable("id") long id){
         return null;
     }
 
