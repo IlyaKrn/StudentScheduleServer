@@ -17,7 +17,7 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
-    @GetMapping("${id}")
+    @GetMapping("{id}")
     public ResponseEntity<User> get(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!userRepository.existsById(id))
@@ -25,13 +25,13 @@ public class UserController {
         User u = userRepository.findById(id).get();
         if (!auth.getName().equals(u.getEmail()))
             u.setPassword(null);
-        if(!(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE)))
+        if(!(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE)) && !auth.getName().equals(u.getEmail()))
             u.setEmail(null);
         return ResponseEntity.ok(u);
 
     }
 
-    @PostMapping("${id}")
+    @PostMapping("{id}")
     public ResponseEntity<User> post(@PathVariable("id") long id, @RequestBody User user){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!userRepository.existsById(id))
@@ -54,7 +54,7 @@ public class UserController {
         u = userRepository.findById(id).get();
         if (!auth.getName().equals(u.getEmail()))
             u.setPassword(null);
-        if(!(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE)))
+        if(!(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE)) && !auth.getName().equals(u.getEmail()))
             u.setEmail(null);
         return ResponseEntity.ok(u);
     }
