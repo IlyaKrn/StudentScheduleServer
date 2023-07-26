@@ -1,8 +1,10 @@
 package com.ilyakrn.studentscheduleserver.web;
 
+import com.ilyakrn.studentscheduleserver.data.repositories.GroupRepository;
+import com.ilyakrn.studentscheduleserver.data.repositories.MemberRepository;
+import com.ilyakrn.studentscheduleserver.data.repositories.SpecificLessonMediaRepository;
 import com.ilyakrn.studentscheduleserver.data.repositories.UserRepository;
-import com.ilyakrn.studentscheduleserver.data.tablemodels.Role;
-import com.ilyakrn.studentscheduleserver.data.tablemodels.User;
+import com.ilyakrn.studentscheduleserver.data.tablemodels.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,11 @@ import java.util.ArrayList;
 public class UserController {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private SpecificLessonMediaRepository specificLessonMediaRepository;
 
     @GetMapping("{id}")
     public ResponseEntity<User> get(@PathVariable("id") long id){
@@ -61,14 +67,42 @@ public class UserController {
         return ResponseEntity.ok(u);
     }
 
-    @GetMapping("{id}/groups")
+    @GetMapping("{id}/members")
     public ResponseEntity<ArrayList<Long>> groups(@PathVariable("id") long id){
-        return null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!userRepository.existsByEmail(auth.getName()))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<Member> ms = (ArrayList<Member>) memberRepository.findMemberByUserId(id).get();
+        ArrayList<Long> ids = new ArrayList<>();
+        for (Member m : ms){
+            ids.add(m.getId());
+        }
+        if(u.getId() == id)
+            return ResponseEntity.ok(ids);
+        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+            return ResponseEntity.ok(ids);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
     }
 
     @GetMapping("{id}/specificLessonMediaComments")
     public ResponseEntity<ArrayList<Long>> specificLessonMediaComments(@PathVariable("id") long id){
-        return null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!userRepository.existsByEmail(auth.getName()))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<SpecificLessonMedia> slms = (ArrayList<SpecificLessonMedia>) specificLessonMediaRepository.findSpecificLessonMediaByUserId(id).get();
+        ArrayList<Long> ids = new ArrayList<>();
+        for (SpecificLessonMedia m : slms){
+            ids.add(m.getId());
+        }
+        if(u.getId() == id)
+            return ResponseEntity.ok(ids);
+        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+            return ResponseEntity.ok(ids);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
     }
 
 }

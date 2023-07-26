@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<List<Member>> findMemberByGroupId(long groupId);
+
+    Optional<List<Member>> findMemberByUserId(long id);
 }
