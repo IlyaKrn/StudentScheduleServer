@@ -59,4 +59,14 @@ public class UserController {
         return ResponseEntity.ok(u);
     }
 
+    @GetMapping("{id}/groups")
+    public ResponseEntity<Long> groups(@PathVariable("id") long id){
+        return null;
+    }
+
+    @GetMapping("{id}/specificLessonMediaComments")
+    public ResponseEntity<Long> specificLessonMediaComments(@PathVariable("id") long id){
+        return null;
+    }
+
 }

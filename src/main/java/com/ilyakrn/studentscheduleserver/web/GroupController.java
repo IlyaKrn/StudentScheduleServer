@@ -41,6 +41,8 @@ public class GroupController {
                 return ResponseEntity.ok(g);
             }
         }
+        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+            return ResponseEntity.ok(g);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
@@ -79,7 +81,7 @@ public class GroupController {
 
 
     @GetMapping("{id}/members")
-    public ResponseEntity<ArrayList<Member>> members(@PathVariable("id") long id){
+    public ResponseEntity<ArrayList<Long>> members(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!userRepository.existsByEmail(auth.getName()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -93,17 +95,23 @@ public class GroupController {
                 return -1 * Integer.compare(o1.getAccessLevel(), o2.getAccessLevel());
             }
         });
-        for(Member m : ms){
+        ArrayList<Long> ids = new ArrayList<>();
+        for (Member m : ms){
+            ids.add(m.getId());
+        }
+        for(Member m : memberRepository.findMemberByGroupId(id).get()){
             if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(ms);
+                return ResponseEntity.ok(ids);
             }
         }
+        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+            return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
 
     @GetMapping("{id}/customLessons")
-    public ResponseEntity<ArrayList<CustomLesson>> customLessons(@PathVariable("id") long id){
+    public ResponseEntity<ArrayList<Long>> customLessons(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!userRepository.existsByEmail(auth.getName()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -111,15 +119,32 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         ArrayList<CustomLesson> cls = (ArrayList<CustomLesson>) customLessonRepository.findCustomLessonByGroupId(id).get();
+        ArrayList<Long> ids = new ArrayList<>();
+        for (CustomLesson cl : cls){
+            ids.add(cl.getId());
+        }
         for(Member m : memberRepository.findMemberByGroupId(id).get()){
             if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(cls);
+                return ResponseEntity.ok(ids);
             }
         }
+        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+            return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-
     }
+
+
+    @GetMapping("{id}/scheduleTemplates")
+    public ResponseEntity<Long> scheduleTemplates(@PathVariable("id") long id){
+        return null;
+    }
+
+    @GetMapping("{id}/specificLessons")
+    public ResponseEntity<Long> specificLessons(@PathVariable("id") long id){
+        return null;
+    }
+
 
 
 
