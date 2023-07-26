@@ -20,7 +20,7 @@ public class SpecificLessonMediaComment {
     @Column(name = "text")
     private String text;
     @Column(name = "author_id")
-    private long authorId;
+    private long userId;
     @Column(name = "media_id")
     private long mediaId;
     @Column(name = "question_comment_id")

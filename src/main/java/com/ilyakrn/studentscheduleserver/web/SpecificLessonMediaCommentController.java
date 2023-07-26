@@ -22,7 +22,7 @@ public class SpecificLessonMediaCommentController {
     public ResponseEntity<SpecificLessonMediaComment> create(@RequestBody SpecificLessonMediaComment specificLessonMediaComment){
         return null;
     }
-    @PostMapping("{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(){
         return null;
     }

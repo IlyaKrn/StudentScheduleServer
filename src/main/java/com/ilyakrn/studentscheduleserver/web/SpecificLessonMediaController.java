@@ -24,7 +24,7 @@ public class SpecificLessonMediaController {
     public ResponseEntity<SpecificLessonMedia> create(@RequestBody SpecificLessonMedia specificLessonMedia){
         return null;
     }
-    @PostMapping("{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(){
         return null;
     }

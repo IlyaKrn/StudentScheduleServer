@@ -1,9 +1,6 @@
 package com.ilyakrn.studentscheduleserver.web;
 
-import com.ilyakrn.studentscheduleserver.data.repositories.GroupRepository;
-import com.ilyakrn.studentscheduleserver.data.repositories.MemberRepository;
-import com.ilyakrn.studentscheduleserver.data.repositories.SpecificLessonMediaRepository;
-import com.ilyakrn.studentscheduleserver.data.repositories.UserRepository;
+import com.ilyakrn.studentscheduleserver.data.repositories.*;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +20,7 @@ public class UserController {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private SpecificLessonMediaRepository specificLessonMediaRepository;
+    private SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
 
     @GetMapping("{id}")
     public ResponseEntity<User> get(@PathVariable("id") long id){
@@ -92,10 +89,10 @@ public class UserController {
         if (!userRepository.existsByEmail(auth.getName()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         User u = userRepository.findByEmail(auth.getName()).get();
-        ArrayList<SpecificLessonMedia> slms = (ArrayList<SpecificLessonMedia>) specificLessonMediaRepository.findSpecificLessonMediaByUserId(id).get();
+        ArrayList<SpecificLessonMediaComment> slmcs = (ArrayList<SpecificLessonMediaComment>) specificLessonMediaCommentRepository.findSpecificLessonMediaCommentByUserId(id).get();
         ArrayList<Long> ids = new ArrayList<>();
-        for (SpecificLessonMedia m : slms){
-            ids.add(m.getId());
+        for (SpecificLessonMediaComment slmc : slmcs){
+            ids.add(slmc.getId());
         }
         if(u.getId() == id)
             return ResponseEntity.ok(ids);

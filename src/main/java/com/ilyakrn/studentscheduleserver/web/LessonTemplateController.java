@@ -22,7 +22,7 @@ public class LessonTemplateController {
     public ResponseEntity<LessonTemplate> create(@RequestBody LessonTemplate lessonTemplate){
         return null;
     }
-    @PostMapping("{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(){
         return null;
     }

@@ -25,7 +25,7 @@ public class ScheduleTemplateController {
     public ResponseEntity<ScheduleTemplate> create(@RequestBody ScheduleTemplate scheduleTemplate){
         return null;
     }
-    @PostMapping("{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(){
         return null;
     }

@@ -24,7 +24,7 @@ public class SpecificLessonController {
     public ResponseEntity<SpecificLesson> create(@RequestBody SpecificLesson specificLesson){
         return null;
     }
-    @PostMapping("{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(){
         return null;
     }

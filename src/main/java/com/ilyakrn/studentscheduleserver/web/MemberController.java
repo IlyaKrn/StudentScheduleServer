@@ -29,7 +29,7 @@ public class MemberController {
     public ResponseEntity<Member> create(@RequestBody Member member){
         return null;
     }
-    @PostMapping("{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(){
         return null;
     }
