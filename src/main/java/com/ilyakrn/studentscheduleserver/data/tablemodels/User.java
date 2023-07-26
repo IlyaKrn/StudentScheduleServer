@@ -28,7 +28,7 @@ public class User {
     private String lastName;
     @Column(name = "banned")
     private boolean banned;
-  //  @ElementCollection
-  //  private List<Role> roles;
+    @ElementCollection
+    private List<Role> roles;
 
 }

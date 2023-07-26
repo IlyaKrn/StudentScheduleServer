@@ -22,13 +22,5 @@ public class Group {
     private long chatId;
     @Column(name = "name")
     private String name;
-  //  @ElementCollection
-  //  private List<Member> members;
-  //  @ElementCollection
-  //  private List<ScheduleTemplate> scheduleTemplates;
-  //  @ElementCollection
-  //  private List<SpecificLesson> specificLessons;
-  //  @ElementCollection
-  //  private List<CustomLesson> customLessons;
 
 }

@@ -25,7 +25,5 @@ public class ScheduleTemplate {
     private long timeStart;
     @Column(name = "time_stop")
     private long timeStop;
-   // @ElementCollection
-   // private List<LessonTemplate> lessonTemplates;
 
 }

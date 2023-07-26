@@ -25,7 +25,5 @@ public class SpecificLesson {
     private long time;
     @Column(name = "canceled")
     private boolean canceled;
-  //  @ElementCollection
-  //  private List<SpecificLessonMedia> specificLessonMedias;
 
 }

@@ -22,7 +22,5 @@ public class SpecificLessonMedia {
     private long specificLessonId;
     @Column(name = "url")
     private String url;
- //   @ElementCollection
- //   private List<SpecificLessonMediaComment> comments;
 
 }
