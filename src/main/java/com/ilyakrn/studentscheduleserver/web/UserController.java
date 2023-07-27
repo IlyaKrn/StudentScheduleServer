@@ -42,6 +42,14 @@ public class UserController {
         if(!userRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findById(id).get();
+        if (user.getEmail() == null)
+            user.setEmail(u.getEmail());
+        if (user.getPassword() == null)
+            user.setPassword(u.getPassword());
+        if (user.getFirstName() == null)
+            user.setFirstName(u.getFirstName());
+        if (user.getLastName() == null)
+            user.setFirstName(u.getLastName());
         user.setEmail(u.getEmail());
         user.setId(u.getId());
         user.getRoles().remove(Role.ULTIMATE);

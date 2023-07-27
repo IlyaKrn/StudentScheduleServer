@@ -57,6 +57,8 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         Group g = groupRepository.findById(id).get();
+        if (group.getName() == null)
+            group.setName(g.getName());
         for(Member m : memberRepository.findMemberByGroupId(g.getId()).get()){
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
@@ -72,6 +74,8 @@ public class GroupController {
 
     @PostMapping("create")
     public ResponseEntity<Group> create(@RequestBody Group group){
+        if (group.getName() == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!userRepository.existsByEmail(auth.getName()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

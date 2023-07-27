@@ -68,6 +68,10 @@ public class MemberController {
     }
     @PostMapping("create")
     public ResponseEntity<Member> create(@RequestBody Member member){
+        if (member.getUserId() == 0)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (member.getGroupId() == 0)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!userRepository.existsByEmail(auth.getName()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
