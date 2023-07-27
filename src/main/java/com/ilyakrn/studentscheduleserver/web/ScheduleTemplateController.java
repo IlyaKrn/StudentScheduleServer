@@ -26,7 +26,7 @@ public class ScheduleTemplateController {
         return null;
     }
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(){
+    public ResponseEntity<Void> delete(@PathVariable("id") long id){
         return null;
     }
     @GetMapping("{id}/lessonTemplates")
