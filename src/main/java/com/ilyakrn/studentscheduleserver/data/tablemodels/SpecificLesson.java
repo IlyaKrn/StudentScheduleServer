@@ -24,6 +24,6 @@ public class SpecificLesson {
     @Column(name = "time")
     private long time;
     @Column(name = "canceled")
-    private boolean canceled;
+    private Boolean canceled;
 
 }

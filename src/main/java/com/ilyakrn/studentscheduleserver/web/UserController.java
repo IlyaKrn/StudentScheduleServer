@@ -49,12 +49,14 @@ public class UserController {
         if (user.getFirstName() == null)
             user.setFirstName(u.getFirstName());
         if (user.getLastName() == null)
-            user.setFirstName(u.getLastName());
+            user.setLastName(u.getLastName());
+        if (user.getBanned() == null)
+            user.setBanned(u.getBanned());
         user.setEmail(u.getEmail());
         user.setId(u.getId());
         user.getRoles().remove(Role.ULTIMATE);
         if(auth.getName().equals(u.getEmail())) {
-            user.setBanned(u.isBanned());
+            user.setBanned(u.getBanned());
         }
         else {
             user.setPassword(u.getPassword());
@@ -62,7 +64,7 @@ public class UserController {
             user.setLastName(u.getLastName());
         }
         if(!(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))) {
-            user.setBanned(u.isBanned());
+            user.setBanned(u.getBanned());
         }
         if(!auth.getAuthorities().contains(Role.ULTIMATE)) {
             user.setRoles(u.getRoles());
