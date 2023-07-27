@@ -19,8 +19,6 @@ public class LessonTemplate {
     private long id;
     @Column(name = "schedule_template_id")
     private long scheduleTemplateId;
-    @Column(name = "group_id")
-    private long groupId;
     @Column(name = "lesson_id")
     private long lessonId;
     @Column(name = "time")

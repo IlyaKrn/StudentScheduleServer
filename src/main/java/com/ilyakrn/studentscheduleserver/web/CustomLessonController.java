@@ -26,6 +26,8 @@ public class CustomLessonController {
     @Autowired
     private LessonTemplateRepository lessonTemplateRepository;
     @Autowired
+    private GroupRepository groupRepository;
+    @Autowired
     private SpecificLessonRepository specificLessonRepository;
 
     @GetMapping("{id}")
@@ -83,6 +85,8 @@ public class CustomLessonController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!userRepository.existsByEmail(auth.getName()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!groupRepository.existsById(customLesson.getGroupId()))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         for(Member mm : memberRepository.findMemberByGroupId(customLesson.getGroupId()).get()){
             if(u.getId() == mm.getUserId() && mm.getAccessLevel() < 2){
