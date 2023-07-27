@@ -77,6 +77,8 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if (!groupRepository.existsById(member.getGroupId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (!userRepository.existsById(member.getUserId()))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         Member m = new Member(0, member.getGroupId(), member.getUserId(), 3);
         for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){

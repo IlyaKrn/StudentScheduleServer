@@ -36,8 +36,6 @@ public class LessonTemplateController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!lessonTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        if(!scheduleTemplateRepository.existsById(id))
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         LessonTemplate lt = lessonTemplateRepository.findById(id).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(lt.getScheduleTemplateId()).get();
@@ -57,8 +55,6 @@ public class LessonTemplateController {
         if (!userRepository.existsByEmail(auth.getName()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!lessonTemplateRepository.existsById(id))
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        if(!scheduleTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         LessonTemplate lt = lessonTemplateRepository.findById(id).get();
