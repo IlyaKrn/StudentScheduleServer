@@ -10,4 +10,8 @@ import java.util.Optional;
 
 public interface SpecificLessonMediaCommentRepository extends JpaRepository<SpecificLessonMediaComment, Long> {
     Optional<List<SpecificLessonMediaComment>> findSpecificLessonMediaCommentByUserId(long id);
+
+    void deleteByMediaId(long id);
+
+    Optional<List<SpecificLessonMediaComment>> findSpecificLessonMediaCommentByMediaId(long id);
 }

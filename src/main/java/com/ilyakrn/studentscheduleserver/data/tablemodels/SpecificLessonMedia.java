@@ -18,6 +18,8 @@ public class SpecificLessonMedia {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private long id;
+    @Column(name = "user_id")
+    private long userId;
     @Column(name = "specific_lesson_id")
     private long specificLessonId;
     @Column(name = "url")
