@@ -96,26 +96,26 @@ public class CustomLessonController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") long id){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        if(!customLessonRepository.existsById(id))
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        User u = userRepository.findByEmail(auth.getName()).get();
-        CustomLesson cl = customLessonRepository.findById(id).get();
-        for(Member mm : memberRepository.findMemberByGroupId(cl.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                if(mm.getAccessLevel() <= 2){
-                    customLessonRepository.delete(cl);
-                    return ResponseEntity.ok().build();
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
+  //  @DeleteMapping("{id}")
+  //  public ResponseEntity<Void> delete(@PathVariable("id") long id){
+  //      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+  //      if (!userRepository.existsByEmail(auth.getName()))
+  //          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+  //      if(!customLessonRepository.existsById(id))
+  //          return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+  //      User u = userRepository.findByEmail(auth.getName()).get();
+  //      CustomLesson cl = customLessonRepository.findById(id).get();
+  //      for(Member mm : memberRepository.findMemberByGroupId(cl.getGroupId()).get()){
+  //          if(u.getId() == mm.getUserId()){
+  //              if(mm.getAccessLevel() <= 2){
+  //                  customLessonRepository.delete(cl);
+  //                  return ResponseEntity.ok().build();
+  //              }
+  //              return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+  //          }
+  //      }
+  //      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+  //  }
     @GetMapping("{id}/lessonTemplates")
     public ResponseEntity<ArrayList<Long>> lessonTemplates(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -125,7 +125,7 @@ public class CustomLessonController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         CustomLesson cl = customLessonRepository.findById(id).get();
-        ArrayList<LessonTemplate> lts = (ArrayList<LessonTemplate>) lessonTemplateRepository.findLessonTemplateByGroupId(cl.getGroupId()).get();
+        ArrayList<LessonTemplate> lts = (ArrayList<LessonTemplate>) lessonTemplateRepository.findLessonTemplateByLessonId(cl.getId()).get();
         lts.sort(new Comparator<LessonTemplate>() {
             @Override
             public int compare(LessonTemplate o1, LessonTemplate o2) {

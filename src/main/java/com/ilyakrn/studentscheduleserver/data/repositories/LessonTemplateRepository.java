@@ -9,5 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LessonTemplateRepository extends JpaRepository<LessonTemplate, Long> {
-    Optional<List<LessonTemplate>> findLessonTemplateByGroupId(long id);
+    Optional<List<LessonTemplate>> findLessonTemplateByScheduleTemplateId(long id);
+    void deleteLessonTemplateByScheduleTemplateId(long id);
+
+    Optional<List<LessonTemplate>> findLessonTemplateByLessonId(long id);
 }
