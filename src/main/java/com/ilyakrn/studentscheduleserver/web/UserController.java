@@ -44,6 +44,7 @@ public class UserController {
         User u = userRepository.findById(id).get();
         user.setEmail(u.getEmail());
         user.setId(u.getId());
+        user.getRoles().remove(Role.ULTIMATE);
         if(auth.getName().equals(u.getEmail())) {
             user.setBanned(u.isBanned());
         }
@@ -54,6 +55,8 @@ public class UserController {
         }
         if(!(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))) {
             user.setBanned(u.isBanned());
+        }
+        if(!auth.getAuthorities().contains(Role.ULTIMATE)) {
             user.setRoles(u.getRoles());
         }
         u = userRepository.findById(id).get();

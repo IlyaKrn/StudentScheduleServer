@@ -51,9 +51,16 @@ public class MemberController {
         Member m = memberRepository.findById(id).get();
         User u = userRepository.findByEmail(auth.getName()).get();
         for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() < m.getAccessLevel() && member.getAccessLevel() >= mm.getAccessLevel()){
-                m = memberRepository.save(new Member(m.getId(), m.getGroupId(), m.getUserId(), member.getAccessLevel()));
-                return ResponseEntity.ok(m);
+            if(u.getId() == mm.getUserId() && mm.getAccessLevel() < m.getAccessLevel()){
+                if(member.getAccessLevel() > mm.getAccessLevel()){
+                    m = memberRepository.save(new Member(m.getId(), m.getGroupId(), m.getUserId(), member.getAccessLevel()));
+                    return ResponseEntity.ok(m);
+                }
+                if(member.getAccessLevel() == 0 && mm.getAccessLevel() == 0){
+                    m = memberRepository.save(new Member(m.getId(), m.getGroupId(), m.getUserId(),0));
+                    memberRepository.save(new Member(mm.getId(), mm.getGroupId(), mm.getUserId(), 1));
+                    return ResponseEntity.ok(m);
+                }
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -84,12 +91,19 @@ public class MemberController {
         User u = userRepository.findByEmail(auth.getName()).get();
         Member m = memberRepository.findById(id).get();
         for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() <= 2){
-                if (mm.getAccessLevel() != 0) {
+            if(u.getId() == mm.getUserId()){
+                if(mm.getAccessLevel() < m.getAccessLevel()){
                     memberRepository.delete(m);
                     return ResponseEntity.ok().build();
                 }
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                if(mm.getUserId() == m.getUserId()){
+                    if (m.getAccessLevel() != 0) {
+                        memberRepository.delete(m);
+                        return ResponseEntity.ok().build();
+                    }
+                    return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                }
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
