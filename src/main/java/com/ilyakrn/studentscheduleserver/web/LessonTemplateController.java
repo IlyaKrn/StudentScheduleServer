@@ -28,8 +28,6 @@ public class LessonTemplateController {
     private SpecificLessonRepository specificLessonRepository;
     @Autowired
     private ScheduleTemplateRepository scheduleTemplateRepository;
-    @Autowired
-    private Scheduler scheduler;
 
     @GetMapping("{id}")
     public ResponseEntity<LessonTemplate> get(@PathVariable("id") long id){
@@ -69,7 +67,7 @@ public class LessonTemplateController {
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
                     lt = lessonTemplateRepository.save(new LessonTemplate(lt.getId(), lt.getScheduleTemplateId(), lessonTemplate.getLessonId(), lessonTemplate.getTime()));
-                    scheduler.updateSchedule(st.getId());
+                    Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(lt);
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -99,7 +97,7 @@ public class LessonTemplateController {
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
                     lt = lessonTemplateRepository.save(lt);
-                    scheduler.updateSchedule(st.getId());
+                    Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(lt);
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -121,7 +119,7 @@ public class LessonTemplateController {
             if(u.getId() == mm.getUserId()){
                 if(mm.getAccessLevel() <= 1){
                     lessonTemplateRepository.delete(lt);
-                    scheduler.updateSchedule(st.getId());
+                    Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok().build();
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

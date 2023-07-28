@@ -18,17 +18,17 @@ public class Scheduler {
 
 
     @Autowired
-    private LessonTemplateRepository lessonTemplateRepository;
+    private static LessonTemplateRepository lessonTemplateRepository;
     @Autowired
-    private SpecificLessonRepository specificLessonRepository;
+    private static SpecificLessonRepository specificLessonRepository;
     @Autowired
-    private ScheduleTemplateRepository scheduleTemplateRepository;
+    private static ScheduleTemplateRepository scheduleTemplateRepository;
     @Autowired
-    private SpecificLessonMediaRepository specificLessonMediaRepository;
+    private static SpecificLessonMediaRepository specificLessonMediaRepository;
     @Autowired
-    private SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
+    private static SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
 
-    private ArrayList<SpecificLesson> scheduleLessons(long endTimestamp, List<LessonTemplate> schedule, long groupId) {
+    private static ArrayList<SpecificLesson> scheduleLessons(long endTimestamp, List<LessonTemplate> schedule, long groupId) {
         final Calendar weekStartCalendar = Calendar.getInstance();
         weekStartCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         weekStartCalendar.set(Calendar.HOUR, 0);
@@ -53,7 +53,7 @@ public class Scheduler {
         return generatedLessons;
     }
 
-    public void updateSchedule(long scheduleId){
+    public static void updateSchedule(long scheduleId){
         ScheduleTemplate st = scheduleTemplateRepository.findById(scheduleId).get();
         ArrayList<LessonTemplate> lts = (ArrayList<LessonTemplate>) lessonTemplateRepository.findLessonTemplateByScheduleTemplateId(st.getId()).get();
         ArrayList<SpecificLesson> sls = scheduleLessons(st.getTimeStop(), lts, st.getGroupId());
@@ -73,20 +73,20 @@ public class Scheduler {
         }
     }
 
-    public static void main(String[] args) {
-        ArrayList<LessonTemplate> schedule = new ArrayList<>();
-        // Получаем расписание в формате UTC +0
-        schedule.add(new LessonTemplate(0, 0L, 1L, 49802000L));
-        schedule.add(new LessonTemplate(0, 0L, 2L, 138002000L));
-        schedule.add(new LessonTemplate(0, 0L, 3L, 217202000L));
-        schedule.add(new LessonTemplate(0, 0L, 4L, 297302000L));
-        schedule.add(new LessonTemplate(0, 0L, 5L, 380102000L));
-
-        // Выдаем распределенное расписание в формате UTC +0
-        Scheduler s = new Scheduler();
-        List<SpecificLesson> result = s.scheduleLessons(1691366342000L, schedule,1L);
-        for (SpecificLesson lesson: result) {
-            System.out.println(format.format(lesson.getTime()) + " " + lesson.getLessonId());
-        }
-    }
+  //  public static void main(String[] args) {
+  //      ArrayList<LessonTemplate> schedule = new ArrayList<>();
+  //      // Получаем расписание в формате UTC +0
+  //      schedule.add(new LessonTemplate(0, 0L, 1L, 49802000L));
+  //      schedule.add(new LessonTemplate(0, 0L, 2L, 138002000L));
+  //      schedule.add(new LessonTemplate(0, 0L, 3L, 217202000L));
+  //      schedule.add(new LessonTemplate(0, 0L, 4L, 297302000L));
+  //      schedule.add(new LessonTemplate(0, 0L, 5L, 380102000L));
+//
+  //      // Выдаем распределенное расписание в формате UTC +0
+  //      Scheduler s = new Scheduler();
+  //      List<SpecificLesson> result = s.scheduleLessons(1691366342000L, schedule,1L);
+  //      for (SpecificLesson lesson: result) {
+  //          System.out.println(format.format(lesson.getTime()) + " " + lesson.getLessonId());
+  //      }
+  //  }
 }

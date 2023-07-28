@@ -36,8 +36,6 @@ public class ScheduleTemplateController {
     private SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
     @Autowired
     private GroupRepository groupRepository;
-    @Autowired
-    private Scheduler scheduler;
 
     @GetMapping("{id}")
     public ResponseEntity<ScheduleTemplate> get(@PathVariable("id") long id){
@@ -77,7 +75,7 @@ public class ScheduleTemplateController {
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
                     st = scheduleTemplateRepository.save(new ScheduleTemplate(st.getId(), st.getGroupId(), scheduleTemplate.getName(), scheduleTemplate.getTimeStart(), scheduleTemplate.getTimeStop()));
-                    scheduler.updateSchedule(st.getId());
+                    Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(st);
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
