@@ -2,7 +2,7 @@ package com.ilyakrn.studentscheduleserver.web;
 
 import com.ilyakrn.studentscheduleserver.data.repositories.*;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.*;
-import com.sun.xml.internal.bind.v2.TODO;
+import com.ilyakrn.studentscheduleserver.web.util.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +28,8 @@ public class LessonTemplateController {
     private SpecificLessonRepository specificLessonRepository;
     @Autowired
     private ScheduleTemplateRepository scheduleTemplateRepository;
+    @Autowired
+    private Scheduler scheduler;
 
     @GetMapping("{id}")
     public ResponseEntity<LessonTemplate> get(@PathVariable("id") long id){
@@ -66,8 +68,8 @@ public class LessonTemplateController {
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
-                    //TODO: generate new specific lessons;
                     lt = lessonTemplateRepository.save(new LessonTemplate(lt.getId(), lt.getScheduleTemplateId(), lessonTemplate.getLessonId(), lessonTemplate.getTime()));
+                    scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(lt);
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -96,8 +98,8 @@ public class LessonTemplateController {
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
-                    //TODO: generate new specific lessons;
                     lt = lessonTemplateRepository.save(lt);
+                    scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(lt);
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -118,8 +120,8 @@ public class LessonTemplateController {
         for(Member mm : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == mm.getUserId()){
                 if(mm.getAccessLevel() <= 1){
-                    //TODO: generate new specific lessons;
                     lessonTemplateRepository.delete(lt);
+                    scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok().build();
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

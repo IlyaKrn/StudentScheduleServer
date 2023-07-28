@@ -39,7 +39,7 @@ public class JwtFilter extends GenericFilterBean {
         final String token = getTokenFromRequest((HttpServletRequest) request);
         if (token != null && jwtProvider.validateAccessToken(token)) {
             final Claims claims = jwtProvider.getAccessClaims(token);
-            if (userRepository.existsByEmail(claims.getSubject()) && !userRepository.findByEmail(claims.getSubject()).get().isBanned()){
+            if (userRepository.existsByEmail(claims.getSubject()) && !userRepository.findByEmail(claims.getSubject()).get().getBanned()){
                 final JwtAuthentication jwtInfoToken = new JwtAuthentication();
                 jwtInfoToken.setAuthenticated(true);
                 jwtInfoToken.setFirstName(claims.getSubject());

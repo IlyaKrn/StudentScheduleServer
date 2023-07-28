@@ -2,6 +2,7 @@ package com.ilyakrn.studentscheduleserver.web;
 
 import com.ilyakrn.studentscheduleserver.data.repositories.*;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.*;
+import com.ilyakrn.studentscheduleserver.web.util.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,13 @@ public class ScheduleTemplateController {
     @Autowired
     private ScheduleTemplateRepository scheduleTemplateRepository;
     @Autowired
+    private SpecificLessonMediaRepository specificLessonMediaRepository;
+    @Autowired
+    private SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
+    @Autowired
     private GroupRepository groupRepository;
+    @Autowired
+    private Scheduler scheduler;
 
     @GetMapping("{id}")
     public ResponseEntity<ScheduleTemplate> get(@PathVariable("id") long id){
@@ -69,8 +76,8 @@ public class ScheduleTemplateController {
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
-                    //TODO: generate new specific lessons;
                     st = scheduleTemplateRepository.save(new ScheduleTemplate(st.getId(), st.getGroupId(), scheduleTemplate.getName(), scheduleTemplate.getTimeStart(), scheduleTemplate.getTimeStop()));
+                    scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(st);
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

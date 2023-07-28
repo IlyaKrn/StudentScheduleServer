@@ -10,4 +10,6 @@ import java.util.Optional;
 
 public interface SpecificLessonMediaRepository extends JpaRepository<SpecificLessonMedia, Long> {
     Optional<List<SpecificLessonMedia>> findSpecificLessonMediaBySpecificLessonId(long id);
+
+    void deleteSpecificLessonMediaBySpecificLessonId(long id);
 }
