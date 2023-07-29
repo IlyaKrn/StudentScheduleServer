@@ -57,9 +57,7 @@ public class SpecificLessonMediaCommentController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!userRepository.existsByEmail(auth.getName()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        if (!userRepository.existsById(specificLessonMediaComment.getUserId()))
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        if (!specificLessonMediaRepository.existsById(specificLessonMediaComment.getMediaId()))
+        if (!specificLessonMediaCommentRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         if (specificLessonMediaComment.getQuestionCommentId() != 0 && !specificLessonMediaCommentRepository.existsById(specificLessonMediaComment.getQuestionCommentId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
