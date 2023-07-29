@@ -40,8 +40,6 @@ public class ScheduleTemplateController {
     @GetMapping("{id}")
     public ResponseEntity<ScheduleTemplate> get(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!scheduleTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -51,7 +49,7 @@ public class ScheduleTemplateController {
                 return ResponseEntity.ok(st);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(st);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -59,22 +57,20 @@ public class ScheduleTemplateController {
     @PostMapping("{id}")
     public ResponseEntity<ScheduleTemplate> post(@PathVariable("id") long id, @RequestBody ScheduleTemplate scheduleTemplate){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!scheduleTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(id).get();
-        if (scheduleTemplate.getName() == null)
-            scheduleTemplate.setName(st.getName());
-        if (scheduleTemplate.getTimeStart() == 0)
-            scheduleTemplate.setTimeStart(st.getTimeStart());
-        if (scheduleTemplate.getTimeStop() == 0)
-            scheduleTemplate.setTimeStop(st.getTimeStop());
+        if (scheduleTemplate.getName() != null)
+            st.setName(scheduleTemplate.getName());
+        if (scheduleTemplate.getTimeStart() != 0)
+            st.setTimeStart(scheduleTemplate.getTimeStart());
+        if (scheduleTemplate.getTimeStop() != 0)
+            st.setTimeStop(scheduleTemplate.getTimeStop());
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
-                    st = scheduleTemplateRepository.save(new ScheduleTemplate(st.getId(), st.getGroupId(), scheduleTemplate.getName(), scheduleTemplate.getTimeStart(), scheduleTemplate.getTimeStop()));
+                    st = scheduleTemplateRepository.save(st);
                     Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(st);
                 }
@@ -86,8 +82,6 @@ public class ScheduleTemplateController {
     @PostMapping("create")
     public ResponseEntity<ScheduleTemplate> create(@RequestBody ScheduleTemplate scheduleTemplate){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         if (scheduleTemplate.getName() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -111,8 +105,6 @@ public class ScheduleTemplateController {
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!scheduleTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -132,10 +124,6 @@ public class ScheduleTemplateController {
     @GetMapping("{id}/lessonTemplates")
     public ResponseEntity<ArrayList<Long>> lessonTemplates(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        if(!lessonTemplateRepository.existsById(id))
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         if(!scheduleTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -156,7 +144,7 @@ public class ScheduleTemplateController {
                 return ResponseEntity.ok(ids);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
