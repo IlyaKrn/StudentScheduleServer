@@ -62,9 +62,11 @@ public class UserController {
             u.setBanned(user.getBanned());
         else if (user.getBanned() != null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        if(user.getRoles().contains(Role.ULTIMATE))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(user.getRoles() != null && !auth.getAuthorities().contains(Role.ULTIMATE)) {
+            if(user.getRoles().contains(Role.ULTIMATE))
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            if(!user.getRoles().contains(Role.USER))
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             u.setRoles(user.getRoles());
         }
         u = userRepository.save(u);
