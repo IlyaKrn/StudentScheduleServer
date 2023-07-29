@@ -34,8 +34,6 @@ public class SpecificLessonMediaCommentController {
     @GetMapping("{id}")
     public ResponseEntity<SpecificLessonMediaComment> get(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!specificLessonMediaCommentRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -47,7 +45,7 @@ public class SpecificLessonMediaCommentController {
                 return ResponseEntity.ok(slmc);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(slmc);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -55,8 +53,6 @@ public class SpecificLessonMediaCommentController {
     @PostMapping("{id}")
     public ResponseEntity<SpecificLessonMediaComment> post(@PathVariable("id") long id, @RequestBody SpecificLessonMediaComment specificLessonMediaComment){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if (!specificLessonMediaCommentRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         if (specificLessonMediaComment.getQuestionCommentId() != 0 && !specificLessonMediaCommentRepository.existsById(specificLessonMediaComment.getQuestionCommentId()))
@@ -70,7 +66,7 @@ public class SpecificLessonMediaCommentController {
         if(specificLessonMediaComment.getQuestionCommentId() != 0)
             slmc.setQuestionCommentId(specificLessonMediaComment.getQuestionCommentId());
         for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() < 2){
+            if(u.getId() == mm.getUserId() && mm.getAccessLevel() <= 1){
                 slmc = specificLessonMediaCommentRepository.save(slmc);
                 return ResponseEntity.ok(slmc);
             }
@@ -79,27 +75,21 @@ public class SpecificLessonMediaCommentController {
     }
     @PostMapping("create")
     public ResponseEntity<SpecificLessonMediaComment> create(@RequestBody SpecificLessonMediaComment specificLessonMediaComment){
-        if (specificLessonMediaComment.getUserId() == 0)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if (specificLessonMediaComment.getMediaId() == 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if (specificLessonMediaComment.getText() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        if (!userRepository.existsById(specificLessonMediaComment.getUserId()))
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         if (!specificLessonMediaRepository.existsById(specificLessonMediaComment.getMediaId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         if (specificLessonMediaComment.getQuestionCommentId() != 0 && !specificLessonMediaCommentRepository.existsById(specificLessonMediaComment.getQuestionCommentId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
-        SpecificLessonMediaComment slmc = new SpecificLessonMediaComment(0, specificLessonMediaComment.getText(), specificLessonMediaComment.getUserId(), specificLessonMediaComment.getMediaId(), specificLessonMediaComment.getQuestionCommentId());
+        SpecificLessonMediaComment slmc = new SpecificLessonMediaComment(0, specificLessonMediaComment.getText(),u.getId(), specificLessonMediaComment.getMediaId(), specificLessonMediaComment.getQuestionCommentId());
         SpecificLessonMedia slm = specificLessonMediaRepository.findById(slmc.getMediaId()).get();
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
         for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() < 2){
+            if(u.getId() == mm.getUserId() && mm.getAccessLevel() <= 1){
                 slmc = specificLessonMediaCommentRepository.save(slmc);
                 return ResponseEntity.ok(slmc);
             }
@@ -109,8 +99,6 @@ public class SpecificLessonMediaCommentController {
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!specificLessonMediaCommentRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
