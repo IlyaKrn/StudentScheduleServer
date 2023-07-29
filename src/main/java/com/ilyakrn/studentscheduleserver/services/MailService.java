@@ -50,7 +50,7 @@ public class MailService {
             tr.close();
 
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+
         }
     }
 
