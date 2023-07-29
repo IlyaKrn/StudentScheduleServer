@@ -25,8 +25,6 @@ public class MemberController {
     @GetMapping("{id}")
     public ResponseEntity<Member> get(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!memberRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Member m = memberRepository.findById(id).get();
@@ -36,7 +34,7 @@ public class MemberController {
                 return ResponseEntity.ok(m);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(m);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -44,21 +42,22 @@ public class MemberController {
     @PostMapping("{id}")
     public ResponseEntity<Member> post(@PathVariable("id") long id, @RequestBody Member member){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!memberRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Member m = memberRepository.findById(id).get();
         User u = userRepository.findByEmail(auth.getName()).get();
+        if (member.getAccessLevel() != 0)
+            m.setAccessLevel(member.getAccessLevel());
         for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() < m.getAccessLevel()){
-                if(member.getAccessLevel() > mm.getAccessLevel()){
-                    m = memberRepository.save(new Member(m.getId(), m.getGroupId(), m.getUserId(), member.getAccessLevel()));
+            if(u.getId() == mm.getUserId()){
+                if(m.getAccessLevel() > mm.getAccessLevel()){
+                    m = memberRepository.save(m);
                     return ResponseEntity.ok(m);
                 }
-                if(member.getAccessLevel() == 0 && mm.getAccessLevel() == 0){
-                    m = memberRepository.save(new Member(m.getId(), m.getGroupId(), m.getUserId(),0));
-                    memberRepository.save(new Member(mm.getId(), mm.getGroupId(), mm.getUserId(), 1));
+                if(m.getAccessLevel() == 0 && mm.getAccessLevel() == 0){
+                    m = memberRepository.save(m);
+                    mm.setAccessLevel(1);
+                    memberRepository.save(mm);
                     return ResponseEntity.ok(m);
                 }
             }
@@ -73,16 +72,14 @@ public class MemberController {
         if (member.getGroupId() == 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if (!groupRepository.existsById(member.getGroupId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         if (!userRepository.existsById(member.getUserId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
-        Member m = new Member(0, member.getGroupId(), member.getUserId(), 3);
+        Member m = new Member(0, member.getGroupId(), member.getUserId(), 2);
         for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() < 2){
+            if(u.getId() == mm.getUserId() && mm.getAccessLevel() <= 1){
                 m = memberRepository.save(m);
                 return ResponseEntity.ok(m);
             }
@@ -92,8 +89,6 @@ public class MemberController {
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!memberRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -103,13 +98,6 @@ public class MemberController {
                 if(mm.getAccessLevel() < m.getAccessLevel()){
                     memberRepository.delete(m);
                     return ResponseEntity.ok().build();
-                }
-                if(mm.getUserId() == m.getUserId()){
-                    if (m.getAccessLevel() != 0) {
-                        memberRepository.delete(m);
-                        return ResponseEntity.ok().build();
-                    }
-                    return ResponseEntity.status(HttpStatus.CONFLICT).build();
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
