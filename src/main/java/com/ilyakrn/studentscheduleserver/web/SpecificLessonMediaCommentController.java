@@ -54,7 +54,30 @@ public class SpecificLessonMediaCommentController {
 
     @PostMapping("{id}")
     public ResponseEntity<SpecificLessonMediaComment> post(@PathVariable("id") long id, @RequestBody SpecificLessonMediaComment specificLessonMediaComment){
-        return null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!userRepository.existsByEmail(auth.getName()))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!userRepository.existsById(specificLessonMediaComment.getUserId()))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (!specificLessonMediaRepository.existsById(specificLessonMediaComment.getMediaId()))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (specificLessonMediaComment.getQuestionCommentId() != 0 && !specificLessonMediaCommentRepository.existsById(specificLessonMediaComment.getQuestionCommentId()))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        SpecificLessonMediaComment slmc = specificLessonMediaCommentRepository.findById(id).get();
+        SpecificLessonMedia slm = specificLessonMediaRepository.findById(slmc.getMediaId()).get();
+        SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
+        if(specificLessonMediaComment.getText() != null)
+            slmc.setText(specificLessonMediaComment.getText());
+        if(specificLessonMediaComment.getQuestionCommentId() != 0)
+            slmc.setQuestionCommentId(specificLessonMediaComment.getQuestionCommentId());
+        for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
+            if(u.getId() == mm.getUserId() && mm.getAccessLevel() < 2){
+                slmc = specificLessonMediaCommentRepository.save(slmc);
+                return ResponseEntity.ok(slmc);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     @PostMapping("create")
     public ResponseEntity<SpecificLessonMediaComment> create(@RequestBody SpecificLessonMediaComment specificLessonMediaComment){
