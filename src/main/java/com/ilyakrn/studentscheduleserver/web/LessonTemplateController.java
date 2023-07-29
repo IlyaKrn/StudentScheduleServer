@@ -32,8 +32,6 @@ public class LessonTemplateController {
     @GetMapping("{id}")
     public ResponseEntity<LessonTemplate> get(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!lessonTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -44,7 +42,7 @@ public class LessonTemplateController {
                 return ResponseEntity.ok(lt);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(lt);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -52,21 +50,19 @@ public class LessonTemplateController {
     @PostMapping("{id}")
     public ResponseEntity<LessonTemplate> post(@PathVariable("id") long id, @RequestBody LessonTemplate lessonTemplate){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!lessonTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         LessonTemplate lt = lessonTemplateRepository.findById(id).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(lt.getScheduleTemplateId()).get();
-        if (lessonTemplate.getTime() == 0)
-            lessonTemplate.setTime(lt.getTime());
-        if (lessonTemplate.getLessonId() == 0)
-            lessonTemplate.setLessonId(lt.getLessonId());
+        if (lessonTemplate.getTime() != 0)
+            lt.setTime(lessonTemplate.getTime());
+        if (lessonTemplate.getLessonId() != 0)
+            lt.setLessonId(lessonTemplate.getLessonId());
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
-                    lt = lessonTemplateRepository.save(new LessonTemplate(lt.getId(), lt.getScheduleTemplateId(), lessonTemplate.getLessonId(), lessonTemplate.getTime()));
+                    lt = lessonTemplateRepository.save(lt);
                     Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(lt);
                 }
@@ -78,8 +74,12 @@ public class LessonTemplateController {
     @PostMapping("create")
     public ResponseEntity<LessonTemplate> create(@RequestBody LessonTemplate lessonTemplate){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (lessonTemplate.getTime() == 0)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (lessonTemplate.getScheduleTemplateId() == 0)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (lessonTemplate.getLessonId() == 0)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if(!scheduleTemplateRepository.existsById(lessonTemplate.getId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         if(!customLessonRepository.existsById(lessonTemplate.getLessonId()))
@@ -87,12 +87,6 @@ public class LessonTemplateController {
         User u = userRepository.findByEmail(auth.getName()).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(lessonTemplate.getScheduleTemplateId()).get();
         LessonTemplate lt = new LessonTemplate(0, lessonTemplate.getScheduleTemplateId(), lessonTemplate.getLessonId(), lessonTemplate.getTime());
-        if (lessonTemplate.getTime() == 0)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        if (lessonTemplate.getScheduleTemplateId() == 0)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        if (lessonTemplate.getLessonId() == 0)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
@@ -108,8 +102,6 @@ public class LessonTemplateController {
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!lessonTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
