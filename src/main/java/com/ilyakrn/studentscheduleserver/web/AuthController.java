@@ -8,6 +8,8 @@ import com.ilyakrn.studentscheduleserver.jwt.models.JwtRegisterRequest;
 import com.ilyakrn.studentscheduleserver.jwt.models.JwtResponse;
 import com.ilyakrn.studentscheduleserver.jwt.models.RefreshJwtRequest;
 import com.ilyakrn.studentscheduleserver.services.AuthService;
+import com.ilyakrn.studentscheduleserver.services.VerifyService;
+import com.ilyakrn.studentscheduleserver.web.models.VerifyRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.security.auth.message.AuthException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
+    private VerifyService verifyService;
+    private Map<String, User> verefyUserCache = new HashMap<>();
     private final AuthService authService;
     private final UserRepository userRepository;
 
@@ -37,7 +44,7 @@ public class AuthController {
             final JwtResponse token = authService.login(authRequest);
             return ResponseEntity.ok(token);
         } catch (AuthException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -49,7 +56,7 @@ public class AuthController {
             final JwtResponse token = authService.getAccessToken(request.getRefreshToken());
             return ResponseEntity.ok(token);
         } catch (AuthException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -61,12 +68,12 @@ public class AuthController {
             final JwtResponse token = authService.refresh(request.getRefreshToken());
             return ResponseEntity.ok(token);
         } catch (AuthException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
     @PostMapping("register")
-    public ResponseEntity<JwtResponse> register(@RequestBody JwtRegisterRequest authRequest) throws AuthException {
+    public ResponseEntity<Void> register(@RequestBody JwtRegisterRequest authRequest) throws AuthException {
         if(authRequest.getEmail() == null || authRequest.getEmail().isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if(authRequest.getPassword() == null || authRequest.getPassword().isEmpty())
@@ -78,17 +85,33 @@ public class AuthController {
         if(!userRepository.existsByEmail(authRequest.getEmail())){
             ArrayList<Role> roles = new ArrayList<>();
             roles.add(Role.USER);
-            userRepository.save(new User(0, authRequest.getEmail(), authRequest.getPassword(), authRequest.getFirstName(), authRequest.getLastName(), false, roles));
+            User u = new User(0, authRequest.getEmail(), authRequest.getPassword(), authRequest.getFirstName(), authRequest.getLastName(), false, roles);
+            verefyUserCache.put(u.getEmail(), u);
+            return ResponseEntity.ok().build();
         }
         else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        try {
-            final JwtResponse token = authService.login(new JwtLoginRequest(authRequest.getEmail(), authRequest.getPassword()));
-            return ResponseEntity.ok(token);
-        } catch (AuthException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+    }
+
+    @PostMapping("verify")
+    public ResponseEntity<JwtResponse> verify(@RequestBody VerifyRequest verifyRequest){
+        if (verefyUserCache.get(verifyRequest.getEmail()) != null){
+            if(verifyService.verify(verifyRequest)){
+                User u = verefyUserCache.get(verifyRequest.getEmail());
+                u = userRepository.save(u);
+                try {
+                    final JwtResponse token = authService.login(new JwtLoginRequest(u.getEmail(), u.getPassword()));
+                    return ResponseEntity.ok(token);
+                } catch (AuthException e){
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
     }
 
 }
