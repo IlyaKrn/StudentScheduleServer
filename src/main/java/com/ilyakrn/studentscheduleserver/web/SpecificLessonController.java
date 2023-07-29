@@ -35,8 +35,6 @@ public class SpecificLessonController {
     @GetMapping("{id}")
     public ResponseEntity<SpecificLesson> get(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!specificLessonRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -46,7 +44,7 @@ public class SpecificLessonController {
                 return ResponseEntity.ok(sl);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(sl);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -54,8 +52,6 @@ public class SpecificLessonController {
     @PostMapping("{id}")
     public ResponseEntity<SpecificLesson> post(@PathVariable("id") long id, @RequestBody SpecificLesson specificLesson) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!specificLessonRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -76,8 +72,6 @@ public class SpecificLessonController {
     @GetMapping("{id}/specificLessonMedias")
     public ResponseEntity<ArrayList<Long>> specificLessonMedias(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!specificLessonRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -92,7 +86,7 @@ public class SpecificLessonController {
                 return ResponseEntity.ok(ids);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
