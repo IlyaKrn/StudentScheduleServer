@@ -28,21 +28,21 @@ public class Scheduler {
     @Autowired
     private static SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
 
-    private static ArrayList<SpecificLesson> scheduleLessons(long endTimestamp, List<LessonTemplate> schedule, long groupId) {
+    private static ArrayList<SpecificLesson> scheduleLessons(long startTimestamp, long endTimestamp, List<LessonTemplate> schedule, long groupId) {
         final Calendar weekStartCalendar = Calendar.getInstance();
+        weekStartCalendar.setTimeInMillis(startTimestamp);
         weekStartCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         weekStartCalendar.set(Calendar.HOUR, 0);
         weekStartCalendar.set(Calendar.MINUTE, 0);
         weekStartCalendar.set(Calendar.SECOND, 0);
         weekStartCalendar.set(Calendar.MILLISECOND, 0);
-        final long currentTime = Calendar.getInstance().getTimeInMillis();
         final long weekStartTime = weekStartCalendar.getTimeInMillis() - 86400000L/2;
         int week = 0;
         ArrayList<SpecificLesson> generatedLessons = new ArrayList<>();
         while ((weekStartTime + WEEK_LENGTH*week) < endTimestamp) {
             for (LessonTemplate lesson: schedule) {
                 long lessonTime = weekStartTime + week*WEEK_LENGTH + lesson.getTime();
-                if (lessonTime < currentTime) continue;
+                if (lessonTime < startTimestamp) continue;
                 if (lessonTime > endTimestamp) break;
                 SpecificLesson newLesson = new SpecificLesson(0, groupId, lesson.getLessonId(),
                         lessonTime, false);
@@ -56,7 +56,7 @@ public class Scheduler {
     public static void updateSchedule(long scheduleId){
         ScheduleTemplate st = scheduleTemplateRepository.findById(scheduleId).get();
         ArrayList<LessonTemplate> lts = (ArrayList<LessonTemplate>) lessonTemplateRepository.findLessonTemplateByScheduleTemplateId(st.getId()).get();
-        ArrayList<SpecificLesson> sls = scheduleLessons(st.getTimeStop(), lts, st.getGroupId());
+        ArrayList<SpecificLesson> sls = scheduleLessons(st.getTimeStart(), st.getTimeStop(), lts, st.getGroupId());
         ArrayList<SpecificLesson> slsold = (ArrayList<SpecificLesson>) specificLessonRepository.findSpecificLessonByGroupId(st.getGroupId()).get();
         for (SpecificLesson sl : slsold){
             if(sl.getTime() > System.currentTimeMillis()) {
