@@ -34,8 +34,6 @@ public class GroupController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         Group g = groupRepository.findById(id).get();
         for(Member m : memberRepository.findMemberByGroupId(g.getId()).get()){
@@ -43,7 +41,7 @@ public class GroupController {
                 return ResponseEntity.ok(g);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(g);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -51,18 +49,16 @@ public class GroupController {
     @PostMapping("{id}")
     public ResponseEntity<Group> post(@PathVariable("id") long id, @RequestBody Group group){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         Group g = groupRepository.findById(id).get();
-        if (group.getName() == null)
-            group.setName(g.getName());
+        if (group.getName() != null)
+            g.setName(group.getName());
         for(Member m : memberRepository.findMemberByGroupId(g.getId()).get()){
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
-                    g = groupRepository.save(new Group(g.getId(), g.getChatId(), group.getName()));
+                    g = groupRepository.save(g);
                     return ResponseEntity.ok(g);
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -74,11 +70,9 @@ public class GroupController {
 
     @PostMapping("create")
     public ResponseEntity<Group> create(@RequestBody Group group){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (group.getName() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         Group g = groupRepository.save(new Group(0, 0, group.getName()));
         memberRepository.save(new Member(0, g.getId(), u.getId(), 0));
@@ -89,8 +83,6 @@ public class GroupController {
     @GetMapping("{id}/members")
     public ResponseEntity<ArrayList<Long>> members(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -110,7 +102,7 @@ public class GroupController {
                 return ResponseEntity.ok(ids);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -119,8 +111,6 @@ public class GroupController {
     @GetMapping("{id}/customLessons")
     public ResponseEntity<ArrayList<Long>> customLessons(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -134,7 +124,7 @@ public class GroupController {
                 return ResponseEntity.ok(ids);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
@@ -144,8 +134,6 @@ public class GroupController {
     @GetMapping("{id}/scheduleTemplates")
     public ResponseEntity<ArrayList<Long>> scheduleTemplates(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -159,7 +147,7 @@ public class GroupController {
                 return ResponseEntity.ok(ids);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
@@ -168,8 +156,6 @@ public class GroupController {
     @GetMapping("{id}/specificLessons")
     public ResponseEntity<ArrayList<Long>> specificLessons(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -183,7 +169,7 @@ public class GroupController {
                 return ResponseEntity.ok(ids);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
