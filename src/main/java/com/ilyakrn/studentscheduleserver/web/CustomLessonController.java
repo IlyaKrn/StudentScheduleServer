@@ -33,8 +33,6 @@ public class CustomLessonController {
     @GetMapping("{id}")
     public ResponseEntity<CustomLesson> get(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!customLessonRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -44,7 +42,7 @@ public class CustomLessonController {
                 return ResponseEntity.ok(cl);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(cl);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -52,20 +50,18 @@ public class CustomLessonController {
     @PostMapping("{id}")
     public ResponseEntity<CustomLesson> post(@PathVariable("id") long id, @RequestBody CustomLesson customLesson){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!customLessonRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         CustomLesson cl = customLessonRepository.findById(id).get();
-        if (customLesson.getName() == null)
-            customLesson.setName(cl.getName());
-        if (customLesson.getTeacher() == null)
-            customLesson.setTeacher(cl.getTeacher());
+        if (customLesson.getName() != null)
+            cl.setName(customLesson.getName());
+        if (customLesson.getTeacher() != null)
+            cl.setTeacher(customLesson.getTeacher());
         for(Member m : memberRepository.findMemberByGroupId(cl.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 if(m.getAccessLevel() <= 1){
-                    cl = customLessonRepository.save(new CustomLesson(cl.getId(), cl.getGroupId(), customLesson.getName(), customLesson.getTeacher()));
+                    cl = customLessonRepository.save(cl);
                     return ResponseEntity.ok(cl);
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -83,44 +79,20 @@ public class CustomLessonController {
         if (customLesson.getTeacher() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if (!groupRepository.existsById(customLesson.getGroupId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         for(Member mm : memberRepository.findMemberByGroupId(customLesson.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() < 2){
+            if(u.getId() == mm.getUserId() && mm.getAccessLevel() <= 1){
                 CustomLesson cl = customLessonRepository.save(new CustomLesson(0, customLesson.getGroupId(), customLesson.getName(), customLesson.getTeacher()));
                 return ResponseEntity.ok(cl);
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-  //  @DeleteMapping("{id}")
-  //  public ResponseEntity<Void> delete(@PathVariable("id") long id){
-  //      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-  //      if (!userRepository.existsByEmail(auth.getName()))
-  //          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-  //      if(!customLessonRepository.existsById(id))
-  //          return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-  //      User u = userRepository.findByEmail(auth.getName()).get();
-  //      CustomLesson cl = customLessonRepository.findById(id).get();
-  //      for(Member mm : memberRepository.findMemberByGroupId(cl.getGroupId()).get()){
-  //          if(u.getId() == mm.getUserId()){
-  //              if(mm.getAccessLevel() <= 2){
-  //                  customLessonRepository.delete(cl);
-  //                  return ResponseEntity.ok().build();
-  //              }
-  //              return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-  //          }
-  //      }
-  //      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-  //  }
     @GetMapping("{id}/lessonTemplates")
     public ResponseEntity<ArrayList<Long>> lessonTemplates(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!lessonTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -141,20 +113,18 @@ public class CustomLessonController {
                 return ResponseEntity.ok(ids);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     @GetMapping("{id}/specificLessons")
     public ResponseEntity<ArrayList<Long>> specificLessons(@PathVariable("id") long id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userRepository.existsByEmail(auth.getName()))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if(!specificLessonRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         CustomLesson cl = customLessonRepository.findById(id).get();
-        ArrayList<SpecificLesson> sls = (ArrayList<SpecificLesson>) specificLessonRepository.findSpecificLessonByGroupId((cl.getGroupId())).get();
+        ArrayList<SpecificLesson> sls = (ArrayList<SpecificLesson>) specificLessonRepository.findSpecificLessonByLessonId((cl.getId())).get();
         sls.sort(new Comparator<SpecificLesson>() {
             @Override
             public int compare(SpecificLesson o1, SpecificLesson o2) {
@@ -170,7 +140,7 @@ public class CustomLessonController {
                 return ResponseEntity.ok(ids);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN) || auth.getAuthorities().contains(Role.ULTIMATE))
+        if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
