@@ -77,6 +77,8 @@ public class GroupController {
         Group g = groupRepository.save(new Group(0, 0, group.getName()));
         ArrayList<MemberRole> roles = new ArrayList<>();
         roles.add(MemberRole.MEMBER);
+        roles.add(MemberRole.ADMIN);
+        roles.add(MemberRole.OWNER);
         memberRepository.save(new Member(0, g.getId(), u.getId(), roles));
         return ResponseEntity.ok(g);
     }
