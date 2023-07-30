@@ -68,6 +68,14 @@ public class UserController {
             if(!user.getRoles().contains(Role.USER))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             u.setRoles(user.getRoles());
+            user.getRoles().clear();
+            if(u.getRoles().contains(Role.ULTIMATE))
+                user.getRoles().add(Role.ULTIMATE);
+            if(u.getRoles().contains(Role.ADMIN))
+                user.getRoles().add(Role.ADMIN);
+            if(u.getRoles().contains(Role.USER))
+                user.getRoles().add(Role.USER);
+            u.setRoles(user.getRoles());
         }
         u = userRepository.save(u);
         if (!auth.getName().equals(u.getEmail()))

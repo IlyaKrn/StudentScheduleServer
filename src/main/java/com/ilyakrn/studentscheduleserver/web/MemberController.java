@@ -46,12 +46,21 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Member m = memberRepository.findById(id).get();
         User u = userRepository.findByEmail(auth.getName()).get();
-        if(member.getRoles() != null)
+        if(member.getRoles() != null){
+            if (m.getRoles().contains(MemberRole.OWNER))
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            if (!m.getRoles().contains(MemberRole.MEMBER))
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             m.setRoles(member.getRoles());
-        if (member.getRoles().contains(MemberRole.OWNER))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        if (!member.getRoles().contains(MemberRole.MEMBER))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            member.getRoles().clear();
+            if(m.getRoles().contains(MemberRole.OWNER))
+                member.getRoles().add(MemberRole.OWNER);
+            if(m.getRoles().contains(MemberRole.ADMIN))
+                member.getRoles().add(MemberRole.ADMIN);
+            if(m.getRoles().contains(MemberRole.MEMBER))
+                member.getRoles().add(MemberRole.MEMBER);
+            m.setRoles(member.getRoles());
+        }
         for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
             if(u.getId() == mm.getUserId()){
                 if(m.getRoles().contains(MemberRole.OWNER) && mm.getRoles().contains(MemberRole.OWNER)){
