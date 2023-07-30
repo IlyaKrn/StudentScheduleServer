@@ -18,9 +18,9 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private long id;
-    @Column(name = "chat_id")
+    @Column(name = "chat_id", nullable = false)
     private long chatId;
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
 }

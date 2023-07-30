@@ -17,13 +17,13 @@ public class ScheduleTemplate {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private long id;
-    @Column(name = "group_id")
+    @Column(name = "group_id", nullable = false)
     private long groupId;
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "time_start")
+    @Column(name = "time_start", nullable = false)
     private long timeStart;
-    @Column(name = "time_stop")
+    @Column(name = "time_stop", nullable = false)
     private long timeStop;
 
 }

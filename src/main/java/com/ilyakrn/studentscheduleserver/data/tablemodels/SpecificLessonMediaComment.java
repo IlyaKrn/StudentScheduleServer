@@ -17,11 +17,11 @@ public class SpecificLessonMediaComment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private long id;
-    @Column(name = "text")
+    @Column(name = "text", nullable = false)
     private String text;
-    @Column(name = "author_id")
+    @Column(name = "author_id", nullable = false)
     private long userId;
-    @Column(name = "media_id")
+    @Column(name = "media_id", nullable = false)
     private long mediaId;
     @Column(name = "question_comment_id")
     private long questionCommentId;

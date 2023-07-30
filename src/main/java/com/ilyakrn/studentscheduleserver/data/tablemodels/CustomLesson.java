@@ -17,11 +17,11 @@ public class CustomLesson {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private long id;
-    @Column(name = "group_id")
+    @Column(name = "group_id", nullable = false)
     private long groupId;
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "teacher")
+    @Column(name = "teacher", nullable = false)
     private String teacher;
 
 

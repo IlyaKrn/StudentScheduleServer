@@ -16,10 +16,10 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private long id;
-    @Column(name = "group_id")
+    @Column(name = "group_id", nullable = false)
     private long groupId;
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private long userId;
-    @Column(name = "access_level")
+    @Column(name = "access_level", nullable = false)
     private int accessLevel;
 }
