@@ -37,8 +37,8 @@ public class UserController {
 
     }
 
-    @PostMapping("{id}")
-    public ResponseEntity<User> post(@PathVariable("id") long id, @RequestBody User user){
+    @PatchMapping("{id}")
+    public ResponseEntity<User> patch(@PathVariable("id") long id, @RequestBody User user){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!userRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

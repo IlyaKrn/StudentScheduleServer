@@ -39,8 +39,8 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @PostMapping("{id}")
-    public ResponseEntity<Member> post(@PathVariable("id") long id, @RequestBody Member member){
+    @PatchMapping("{id}")
+    public ResponseEntity<Member> patch(@PathVariable("id") long id, @RequestBody Member member){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!memberRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

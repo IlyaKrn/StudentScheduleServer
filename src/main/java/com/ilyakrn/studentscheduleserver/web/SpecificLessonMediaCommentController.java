@@ -50,8 +50,8 @@ public class SpecificLessonMediaCommentController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @PostMapping("{id}")
-    public ResponseEntity<SpecificLessonMediaComment> post(@PathVariable("id") long id, @RequestBody SpecificLessonMediaComment specificLessonMediaComment){
+    @PatchMapping("{id}")
+    public ResponseEntity<SpecificLessonMediaComment> patch(@PathVariable("id") long id, @RequestBody SpecificLessonMediaComment specificLessonMediaComment){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!specificLessonMediaCommentRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

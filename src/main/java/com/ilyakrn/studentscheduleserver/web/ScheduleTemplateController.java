@@ -54,8 +54,8 @@ public class ScheduleTemplateController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @PostMapping("{id}")
-    public ResponseEntity<ScheduleTemplate> post(@PathVariable("id") long id, @RequestBody ScheduleTemplate scheduleTemplate){
+    @PatchMapping("{id}")
+    public ResponseEntity<ScheduleTemplate> patch(@PathVariable("id") long id, @RequestBody ScheduleTemplate scheduleTemplate){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!scheduleTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

@@ -46,8 +46,8 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @PostMapping("{id}")
-    public ResponseEntity<Group> post(@PathVariable("id") long id, @RequestBody Group group){
+    @PatchMapping("{id}")
+    public ResponseEntity<Group> patch(@PathVariable("id") long id, @RequestBody Group group){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

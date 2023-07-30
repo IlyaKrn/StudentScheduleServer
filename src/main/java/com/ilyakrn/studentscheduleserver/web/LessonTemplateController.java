@@ -47,8 +47,8 @@ public class LessonTemplateController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @PostMapping("{id}")
-    public ResponseEntity<LessonTemplate> post(@PathVariable("id") long id, @RequestBody LessonTemplate lessonTemplate){
+    @PatchMapping("{id}")
+    public ResponseEntity<LessonTemplate> patch(@PathVariable("id") long id, @RequestBody LessonTemplate lessonTemplate){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!lessonTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

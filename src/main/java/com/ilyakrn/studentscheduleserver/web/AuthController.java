@@ -11,6 +11,7 @@ import com.ilyakrn.studentscheduleserver.services.AuthService;
 import com.ilyakrn.studentscheduleserver.services.VerifyService;
 import com.ilyakrn.studentscheduleserver.web.models.VerifyRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,15 +23,15 @@ import javax.security.auth.message.AuthException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
+    @Autowired
     private VerifyService verifyService;
-    private Map<String, User> verefyUserCache = new HashMap<>();
+    private Map<String, User> verifyUserCache = new HashMap<>();
     private final AuthService authService;
     private final UserRepository userRepository;
 
@@ -86,7 +87,8 @@ public class AuthController {
             ArrayList<Role> roles = new ArrayList<>();
             roles.add(Role.USER);
             User u = new User(0, authRequest.getEmail(), authRequest.getPassword(), authRequest.getFirstName(), authRequest.getLastName(), false, roles);
-            verefyUserCache.put(u.getEmail(), u);
+            verifyUserCache.put(u.getEmail(), u);
+            verifyService.sendCode(u.getEmail());
             return ResponseEntity.ok().build();
         }
         else {
@@ -97,9 +99,9 @@ public class AuthController {
 
     @PostMapping("verify")
     public ResponseEntity<JwtResponse> verify(@RequestBody VerifyRequest verifyRequest){
-        if (verefyUserCache.get(verifyRequest.getEmail()) != null){
+        if (verifyUserCache.get(verifyRequest.getEmail()) != null){
             if(verifyService.verify(verifyRequest)){
-                User u = verefyUserCache.get(verifyRequest.getEmail());
+                User u = verifyUserCache.get(verifyRequest.getEmail());
                 u = userRepository.save(u);
                 try {
                     final JwtResponse token = authService.login(new JwtLoginRequest(u.getEmail(), u.getPassword()));
