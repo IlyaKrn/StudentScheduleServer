@@ -121,7 +121,6 @@ ALTER TABLE IF EXISTS public.schedule_templates
 CREATE TABLE IF NOT EXISTS public.members
 (
     id bigint NOT NULL,
-    access_level integer NOT NULL,
     group_id bigint NOT NULL,
     user_id bigint NOT NULL,
     CONSTRAINT members_pkey PRIMARY KEY (id)
@@ -131,6 +130,26 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.members
     OWNER to postgres;
+
+-- Table: public.member_roles
+
+-- DROP TABLE IF EXISTS public.member_roles;
+
+CREATE TABLE IF NOT EXISTS public.member_roles
+(
+    member_id bigint NOT NULL,
+    roles integer,
+    CONSTRAINT fk431yrnsn5s4omvwjvl9dre1n0 FOREIGN KEY (member_id)
+        REFERENCES public.members (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.member_roles
+    OWNER to postgres;
+
 
 -- Table: public.lesson_templates
 

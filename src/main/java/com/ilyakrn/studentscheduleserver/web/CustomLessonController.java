@@ -60,7 +60,7 @@ public class CustomLessonController {
             cl.setTeacher(customLesson.getTeacher());
         for(Member m : memberRepository.findMemberByGroupId(cl.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
-                if(m.getAccessLevel() <= 1){
+                if(m.getRoles().contains(MemberRole.ADMIN)){
                     cl = customLessonRepository.save(cl);
                     return ResponseEntity.ok(cl);
                 }
@@ -83,7 +83,7 @@ public class CustomLessonController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         for(Member mm : memberRepository.findMemberByGroupId(customLesson.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() <= 1){
+            if(u.getId() == mm.getUserId() && mm.getRoles().contains(MemberRole.ADMIN)){
                 CustomLesson cl = customLessonRepository.save(new CustomLesson(0, customLesson.getGroupId(), customLesson.getName(), customLesson.getTeacher()));
                 return ResponseEntity.ok(cl);
             }

@@ -46,18 +46,24 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Member m = memberRepository.findById(id).get();
         User u = userRepository.findByEmail(auth.getName()).get();
-        if (member.getAccessLevel() != 0)
-            m.setAccessLevel(member.getAccessLevel());
+        if(member.getRoles() != null)
+            m.setRoles(member.getRoles());
+        if (member.getRoles().contains(MemberRole.OWNER))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!member.getRoles().contains(MemberRole.MEMBER))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
             if(u.getId() == mm.getUserId()){
-                if(m.getAccessLevel() > mm.getAccessLevel()){
+                if(m.getRoles().contains(MemberRole.OWNER) && mm.getRoles().contains(MemberRole.OWNER)){
                     m = memberRepository.save(m);
+                    ArrayList<MemberRole> rs = (ArrayList<MemberRole>) mm.getRoles();
+                    rs.remove(MemberRole.OWNER);
+                    mm.setRoles(rs);
+                    memberRepository.save(mm);
                     return ResponseEntity.ok(m);
                 }
-                if(m.getAccessLevel() == 0 && mm.getAccessLevel() == 0){
+                if(mm.getRoles().contains(MemberRole.OWNER)){
                     m = memberRepository.save(m);
-                    mm.setAccessLevel(1);
-                    memberRepository.save(mm);
                     return ResponseEntity.ok(m);
                 }
             }
@@ -77,9 +83,11 @@ public class MemberController {
         if (!userRepository.existsById(member.getUserId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
-        Member m = new Member(0, member.getGroupId(), member.getUserId(), 2);
+        ArrayList<MemberRole> rs = new ArrayList<>();
+        rs.add(MemberRole.MEMBER);
+        Member m = new Member(0, member.getGroupId(), member.getUserId(), rs);
         for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() <= 1){
+            if(u.getId() == mm.getUserId() && mm.getRoles().contains(MemberRole.ADMIN)){
                 m = memberRepository.save(m);
                 return ResponseEntity.ok(m);
             }
@@ -95,7 +103,7 @@ public class MemberController {
         Member m = memberRepository.findById(id).get();
         for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
             if(u.getId() == mm.getUserId()){
-                if(mm.getAccessLevel() < m.getAccessLevel()){
+                if(mm.getRoles().contains(MemberRole.ADMIN)){
                     memberRepository.delete(m);
                     return ResponseEntity.ok().build();
                 }

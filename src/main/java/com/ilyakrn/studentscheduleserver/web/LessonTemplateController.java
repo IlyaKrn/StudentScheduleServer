@@ -61,7 +61,7 @@ public class LessonTemplateController {
             lt.setLessonId(lessonTemplate.getLessonId());
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
-                if(m.getAccessLevel() <= 1){
+                if(m.getRoles().contains(MemberRole.ADMIN)){
                     lt = lessonTemplateRepository.save(lt);
                     Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(lt);
@@ -89,7 +89,7 @@ public class LessonTemplateController {
         LessonTemplate lt = new LessonTemplate(0, lessonTemplate.getScheduleTemplateId(), lessonTemplate.getLessonId(), lessonTemplate.getTime());
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
-                if(m.getAccessLevel() <= 1){
+                if(m.getRoles().contains(MemberRole.ADMIN)){
                     lt = lessonTemplateRepository.save(lt);
                     Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(lt);
@@ -109,7 +109,7 @@ public class LessonTemplateController {
         ScheduleTemplate st = scheduleTemplateRepository.findById(lt.getScheduleTemplateId()).get();
         for(Member mm : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == mm.getUserId()){
-                if(mm.getAccessLevel() <= 1){
+                if(mm.getRoles().contains(MemberRole.ADMIN)){
                     lessonTemplateRepository.delete(lt);
                     Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok().build();

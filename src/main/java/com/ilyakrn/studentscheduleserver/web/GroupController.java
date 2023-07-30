@@ -57,7 +57,7 @@ public class GroupController {
             g.setName(group.getName());
         for(Member m : memberRepository.findMemberByGroupId(g.getId()).get()){
             if(u.getId() == m.getUserId()){
-                if(m.getAccessLevel() <= 1){
+                if(m.getRoles().contains(MemberRole.ADMIN)){
                     g = groupRepository.save(g);
                     return ResponseEntity.ok(g);
                 }
@@ -75,7 +75,9 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         Group g = groupRepository.save(new Group(0, 0, group.getName()));
-        memberRepository.save(new Member(0, g.getId(), u.getId(), 0));
+        ArrayList<MemberRole> roles = new ArrayList<>();
+        roles.add(MemberRole.MEMBER);
+        memberRepository.save(new Member(0, g.getId(), u.getId(), roles));
         return ResponseEntity.ok(g);
     }
 
@@ -90,7 +92,7 @@ public class GroupController {
         ms.sort(new Comparator<Member>() {
             @Override
             public int compare(Member o1, Member o2) {
-                return -1 * Integer.compare(o1.getAccessLevel(), o2.getAccessLevel());
+                return Integer.compare(o1.getRoles().size(), o2.getRoles().size());
             }
         });
         ArrayList<Long> ids = new ArrayList<>();

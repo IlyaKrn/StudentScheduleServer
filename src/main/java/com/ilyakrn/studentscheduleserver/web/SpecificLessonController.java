@@ -60,7 +60,7 @@ public class SpecificLessonController {
             sl.setCanceled(specificLesson.getCanceled());
         for(Member m : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
-                if(m.getAccessLevel() <= 1){
+                if(m.getRoles().contains(MemberRole.ADMIN)){
                     sl = specificLessonRepository.save(sl);
                     return ResponseEntity.ok(sl);
                 }

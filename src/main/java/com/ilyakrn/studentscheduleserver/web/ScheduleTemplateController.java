@@ -69,7 +69,7 @@ public class ScheduleTemplateController {
             st.setTimeStop(scheduleTemplate.getTimeStop());
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
-                if(m.getAccessLevel() <= 1){
+                if(m.getRoles().contains(MemberRole.ADMIN)){
                     st = scheduleTemplateRepository.save(st);
                     Scheduler.updateSchedule(st.getId());
                     return ResponseEntity.ok(st);
@@ -93,7 +93,7 @@ public class ScheduleTemplateController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         for(Member m : memberRepository.findMemberByGroupId(scheduleTemplate.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
-                if(m.getAccessLevel() <= 1){
+                if(m.getRoles().contains(MemberRole.ADMIN)){
                     ScheduleTemplate st = scheduleTemplateRepository.save(new ScheduleTemplate(0, scheduleTemplate.getGroupId(), scheduleTemplate.getName(), scheduleTemplate.getTimeStart(), scheduleTemplate.getTimeStop()));
                     return ResponseEntity.ok(st);
                 }
@@ -111,7 +111,7 @@ public class ScheduleTemplateController {
         ScheduleTemplate st = scheduleTemplateRepository.findById(id).get();
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
-                if(m.getAccessLevel() <= 1){
+                if(m.getRoles().contains(MemberRole.ADMIN)){
                     lessonTemplateRepository.deleteLessonTemplateByScheduleTemplateId(id);
                     scheduleTemplateRepository.deleteById(id);
                     return ResponseEntity.ok().build();

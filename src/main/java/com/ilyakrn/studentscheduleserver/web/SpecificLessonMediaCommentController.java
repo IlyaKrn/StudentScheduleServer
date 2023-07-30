@@ -66,7 +66,7 @@ public class SpecificLessonMediaCommentController {
         if(specificLessonMediaComment.getQuestionCommentId() != 0)
             slmc.setQuestionCommentId(specificLessonMediaComment.getQuestionCommentId());
         for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() <= 1){
+            if(u.getId() == mm.getUserId() && u.getId() == slmc.getUserId()){
                 slmc = specificLessonMediaCommentRepository.save(slmc);
                 return ResponseEntity.ok(slmc);
             }
@@ -89,7 +89,7 @@ public class SpecificLessonMediaCommentController {
         SpecificLessonMedia slm = specificLessonMediaRepository.findById(slmc.getMediaId()).get();
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
         for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == mm.getUserId() && mm.getAccessLevel() <= 1){
+            if(u.getId() == mm.getUserId() && u.getId() == slmc.getUserId()){
                 slmc = specificLessonMediaCommentRepository.save(slmc);
                 return ResponseEntity.ok(slmc);
             }
@@ -103,8 +103,14 @@ public class SpecificLessonMediaCommentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         User u = userRepository.findByEmail(auth.getName()).get();
         SpecificLessonMediaComment slmc = specificLessonMediaCommentRepository.findById(id).get();
-        if(slmc.getUserId() == u.getId()){
-            specificLessonMediaCommentRepository.delete(slmc);
+        SpecificLessonMedia slm = specificLessonMediaRepository.findById(slmc.getMediaId()).get();
+        SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
+        for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
+            if(u.getId() == mm.getUserId() && u.getId() == slmc.getUserId()){
+                slmc = specificLessonMediaCommentRepository.save(slmc);
+                specificLessonMediaCommentRepository.delete(slmc);
+                return ResponseEntity.ok().build();
+            }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

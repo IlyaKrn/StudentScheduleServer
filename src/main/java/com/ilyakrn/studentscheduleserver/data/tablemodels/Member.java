@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -20,6 +21,6 @@ public class Member {
     private long groupId;
     @Column(name = "user_id", nullable = false)
     private long userId;
-    @Column(name = "access_level", nullable = false)
-    private int accessLevel;
+    @ElementCollection
+    private List<MemberRole> roles;
 }
