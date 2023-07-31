@@ -39,10 +39,9 @@ public class LessonTemplateController {
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(lt);
         ScheduleTemplate st = scheduleTemplateRepository.findById(lt.getScheduleTemplateId()).get();
-        for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(lt);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(st.getGroupId(), u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(lt);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -59,15 +58,14 @@ public class LessonTemplateController {
             lt.setTime(lessonTemplate.getTime());
         if (lessonTemplate.getLessonId() != 0)
             lt.setLessonId(lessonTemplate.getLessonId());
-        for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                if(m.getRoles().contains(MemberRole.ADMIN)){
-                    lt = lessonTemplateRepository.save(lt);
-                    Scheduler.updateSchedule(st.getId());
-                    return ResponseEntity.ok(lt);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(st.getGroupId(), u.getId()).get();
+        if(m != null){
+            if(m.getRoles().contains(MemberRole.ADMIN)){
+                lt = lessonTemplateRepository.save(lt);
+                Scheduler.updateSchedule(st.getId());
+                return ResponseEntity.ok(lt);
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -87,15 +85,14 @@ public class LessonTemplateController {
         User u = userRepository.findByEmail(auth.getName()).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(lessonTemplate.getScheduleTemplateId()).get();
         LessonTemplate lt = new LessonTemplate(0, lessonTemplate.getScheduleTemplateId(), lessonTemplate.getLessonId(), lessonTemplate.getTime());
-        for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                if(m.getRoles().contains(MemberRole.ADMIN)){
-                    lt = lessonTemplateRepository.save(lt);
-                    Scheduler.updateSchedule(st.getId());
-                    return ResponseEntity.ok(lt);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(st.getGroupId(), u.getId()).get();
+        if(m != null){
+            if(m.getRoles().contains(MemberRole.ADMIN)){
+                lt = lessonTemplateRepository.save(lt);
+                Scheduler.updateSchedule(st.getId());
+                return ResponseEntity.ok(lt);
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -107,15 +104,14 @@ public class LessonTemplateController {
         User u = userRepository.findByEmail(auth.getName()).get();
         LessonTemplate lt = lessonTemplateRepository.findById(id).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(lt.getScheduleTemplateId()).get();
-        for(Member mm : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                if(mm.getRoles().contains(MemberRole.ADMIN)){
-                    lessonTemplateRepository.delete(lt);
-                    Scheduler.updateSchedule(st.getId());
-                    return ResponseEntity.ok().build();
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(st.getGroupId(), u.getId()).get();
+        if(m != null){
+            if(m.getRoles().contains(MemberRole.ADMIN)){
+                lessonTemplateRepository.delete(lt);
+                Scheduler.updateSchedule(st.getId());
+                return ResponseEntity.ok().build();
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

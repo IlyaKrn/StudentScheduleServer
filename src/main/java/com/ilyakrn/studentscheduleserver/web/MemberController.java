@@ -31,10 +31,9 @@ public class MemberController {
         Member m = memberRepository.findById(id).get();
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(m);
-        for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                return ResponseEntity.ok(m);
-            }
+        Member mm = memberRepository.findByGroupIdAndUserId(m.getGroupId(), u.getId()).get();
+        if(mm != null){
+            return ResponseEntity.ok(m);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -61,22 +60,21 @@ public class MemberController {
                 member.getRoles().add(MemberRole.MEMBER);
             m.setRoles(member.getRoles());
         }
-        for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                if(m.getRoles().contains(MemberRole.OWNER) && mm.getRoles().contains(MemberRole.OWNER)){
-                    m = memberRepository.save(m);
-                    ArrayList<MemberRole> rs = (ArrayList<MemberRole>) mm.getRoles();
-                    rs.remove(MemberRole.OWNER);
-                    mm.setRoles(rs);
-                    memberRepository.save(mm);
-                    return ResponseEntity.ok(m);
-                }
-                if(mm.getRoles().contains(MemberRole.OWNER)){
-                    m = memberRepository.save(m);
-                    return ResponseEntity.ok(m);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member mm = memberRepository.findByGroupIdAndUserId(m.getGroupId(), u.getId()).get();
+        if(mm != null){
+            if(m.getRoles().contains(MemberRole.OWNER) && mm.getRoles().contains(MemberRole.OWNER)){
+                m = memberRepository.save(m);
+                ArrayList<MemberRole> rs = (ArrayList<MemberRole>) mm.getRoles();
+                rs.remove(MemberRole.OWNER);
+                mm.setRoles(rs);
+                memberRepository.save(mm);
+                return ResponseEntity.ok(m);
             }
+            if(mm.getRoles().contains(MemberRole.OWNER)){
+                m = memberRepository.save(m);
+                return ResponseEntity.ok(m);
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
@@ -96,14 +94,13 @@ public class MemberController {
         ArrayList<MemberRole> rs = new ArrayList<>();
         rs.add(MemberRole.MEMBER);
         Member m = new Member(0, member.getGroupId(), member.getUserId(), rs);
-        for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                if (mm.getRoles().contains(MemberRole.ADMIN)){
-                    m = memberRepository.save(m);
-                    return ResponseEntity.ok(m);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member mm = memberRepository.findByGroupIdAndUserId(m.getGroupId(), u.getId()).get();
+        if(mm != null){
+            if (mm.getRoles().contains(MemberRole.ADMIN)){
+                m = memberRepository.save(m);
+                return ResponseEntity.ok(m);
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -114,14 +111,13 @@ public class MemberController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         Member m = memberRepository.findById(id).get();
-        for(Member mm : memberRepository.findMemberByGroupId(m.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                if(mm.getRoles().contains(MemberRole.ADMIN)){
-                    memberRepository.delete(m);
-                    return ResponseEntity.ok().build();
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member mm = memberRepository.findByGroupIdAndUserId(m.getGroupId(), u.getId()).get();
+        if(mm != null){
+            if(mm.getRoles().contains(MemberRole.ADMIN) || u.getId() == m.getUserId()){
+                memberRepository.delete(m);
+                return ResponseEntity.ok().build();
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

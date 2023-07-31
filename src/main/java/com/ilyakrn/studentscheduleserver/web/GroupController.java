@@ -38,10 +38,9 @@ public class GroupController {
         Group g = groupRepository.findById(id).get();
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(g);
-        for(Member m : memberRepository.findMemberByGroupId(g.getId()).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(g);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(g.getId(), u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(g);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -55,14 +54,13 @@ public class GroupController {
         Group g = groupRepository.findById(id).get();
         if (group.getName() != null)
             g.setName(group.getName());
-        for(Member m : memberRepository.findMemberByGroupId(g.getId()).get()){
-            if(u.getId() == m.getUserId()){
-                if(m.getRoles().contains(MemberRole.ADMIN)){
-                    g = groupRepository.save(g);
-                    return ResponseEntity.ok(g);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(g.getId(), u.getId()).get();
+        if(m != null){
+            if(m.getRoles().contains(MemberRole.ADMIN)){
+                g = groupRepository.save(g);
+                return ResponseEntity.ok(g);
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
@@ -101,13 +99,12 @@ public class GroupController {
         for (Member m : ms){
             ids.add(m.getId());
         }
-        for(Member m : memberRepository.findMemberByGroupId(id).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(ids);
-            }
-        }
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
+        Member m = memberRepository.findByGroupIdAndUserId(id, u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(ids);
+        }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
@@ -123,13 +120,12 @@ public class GroupController {
         for (CustomLesson cl : cls){
             ids.add(cl.getId());
         }
-        for(Member m : memberRepository.findMemberByGroupId(id).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(ids);
-            }
-        }
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
+        Member m = memberRepository.findByGroupIdAndUserId(id, u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(ids);
+        }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
     }
@@ -146,13 +142,12 @@ public class GroupController {
         for (ScheduleTemplate st : sts){
             ids.add(st.getId());
         }
-        for(Member m : memberRepository.findMemberByGroupId(id).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(ids);
-            }
-        }
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
+        Member m = memberRepository.findByGroupIdAndUserId(id, u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(ids);
+        }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
     }
@@ -168,13 +163,12 @@ public class GroupController {
         for (SpecificLesson sl : sls){
             ids.add(sl.getId());
         }
-        for(Member m : memberRepository.findMemberByGroupId(id).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(ids);
-            }
-        }
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
+        Member m = memberRepository.findByGroupIdAndUserId(id, u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(ids);
+        }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
     }

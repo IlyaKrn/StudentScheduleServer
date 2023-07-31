@@ -45,10 +45,9 @@ public class SpecificLessonMediaController {
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(slm);
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
-        for(Member m : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(slm);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(slm);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -64,11 +63,10 @@ public class SpecificLessonMediaController {
         User u = userRepository.findByEmail(auth.getName()).get();
         SpecificLessonMedia slm = new SpecificLessonMedia(0, u.getId(), specificLessonMedia.getSpecificLessonId(), specificLessonMedia.getUrl());
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
-        for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                slm = specificLessonMediaRepository.save(slm);
-                return ResponseEntity.ok(slm);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            slm = specificLessonMediaRepository.save(slm);
+            return ResponseEntity.ok(slm);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -79,9 +77,13 @@ public class SpecificLessonMediaController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         SpecificLessonMedia slm = specificLessonMediaRepository.findById(id).get();
-        if(slm.getUserId() == u.getId()){
-            specificLessonMediaRepository.delete(slm);
-            specificLessonMediaCommentRepository.deleteByMediaId(slm.getId());
+        SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            if(slm.getUserId() == u.getId()){
+                specificLessonMediaRepository.delete(slm);
+                specificLessonMediaCommentRepository.deleteByMediaId(slm.getId());
+            }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -100,10 +102,9 @@ public class SpecificLessonMediaController {
         }
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
-        for(Member m : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(ids);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(ids);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

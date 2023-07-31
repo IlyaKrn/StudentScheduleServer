@@ -42,10 +42,9 @@ public class SpecificLessonMediaCommentController {
             return ResponseEntity.ok(slmc);
         SpecificLessonMedia slm = specificLessonMediaRepository.findById(slmc.getMediaId()).get();
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
-        for(Member m : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(slmc);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(slmc);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -65,14 +64,13 @@ public class SpecificLessonMediaCommentController {
             slmc.setText(specificLessonMediaComment.getText());
         if(specificLessonMediaComment.getQuestionCommentId() != 0)
             slmc.setQuestionCommentId(specificLessonMediaComment.getQuestionCommentId());
-        for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                if (u.getId() == slmc.getUserId()){
-                    slmc = specificLessonMediaCommentRepository.save(slmc);
-                    return ResponseEntity.ok(slmc);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            if (u.getId() == slmc.getUserId()){
+                slmc = specificLessonMediaCommentRepository.save(slmc);
+                return ResponseEntity.ok(slmc);
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -91,14 +89,13 @@ public class SpecificLessonMediaCommentController {
         SpecificLessonMediaComment slmc = new SpecificLessonMediaComment(0, specificLessonMediaComment.getText(),u.getId(), specificLessonMediaComment.getMediaId(), specificLessonMediaComment.getQuestionCommentId());
         SpecificLessonMedia slm = specificLessonMediaRepository.findById(slmc.getMediaId()).get();
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
-        for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                if (u.getId() == slmc.getUserId()){
-                    slmc = specificLessonMediaCommentRepository.save(slmc);
-                    return ResponseEntity.ok(slmc);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            if (u.getId() == slmc.getUserId()){
+                slmc = specificLessonMediaCommentRepository.save(slmc);
+                return ResponseEntity.ok(slmc);
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -111,14 +108,13 @@ public class SpecificLessonMediaCommentController {
         SpecificLessonMediaComment slmc = specificLessonMediaCommentRepository.findById(id).get();
         SpecificLessonMedia slm = specificLessonMediaRepository.findById(slmc.getMediaId()).get();
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
-        for(Member mm : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == mm.getUserId()){
-                if (u.getId() == slmc.getUserId()) {
-                    specificLessonMediaCommentRepository.delete(slmc);
-                    return ResponseEntity.ok().build();
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            if (u.getId() == slmc.getUserId()) {
+                specificLessonMediaCommentRepository.delete(slmc);
+                return ResponseEntity.ok().build();
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

@@ -41,10 +41,9 @@ public class SpecificLessonController {
         SpecificLesson sl = specificLessonRepository.findById(id).get();
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(sl);
-        for(Member m : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(sl);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(sl);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -58,14 +57,13 @@ public class SpecificLessonController {
         SpecificLesson sl = specificLessonRepository.findById(id).get();
         if(specificLesson.getCanceled() != null)
             sl.setCanceled(specificLesson.getCanceled());
-        for(Member m : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                if(m.getRoles().contains(MemberRole.ADMIN)){
-                    sl = specificLessonRepository.save(sl);
-                    return ResponseEntity.ok(sl);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            if(m.getRoles().contains(MemberRole.ADMIN)){
+                sl = specificLessonRepository.save(sl);
+                return ResponseEntity.ok(sl);
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -83,10 +81,9 @@ public class SpecificLessonController {
         }
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
-        for(Member m : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(ids);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(ids);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

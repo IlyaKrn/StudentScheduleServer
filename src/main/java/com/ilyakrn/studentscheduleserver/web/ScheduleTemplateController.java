@@ -46,10 +46,9 @@ public class ScheduleTemplateController {
         ScheduleTemplate st = scheduleTemplateRepository.findById(id).get();
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(st);
-        for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(st);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(st.getGroupId(), u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(st);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -67,15 +66,14 @@ public class ScheduleTemplateController {
             st.setTimeStart(scheduleTemplate.getTimeStart());
         if (scheduleTemplate.getTimeStop() != 0)
             st.setTimeStop(scheduleTemplate.getTimeStop());
-        for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                if(m.getRoles().contains(MemberRole.ADMIN)){
-                    st = scheduleTemplateRepository.save(st);
-                    Scheduler.updateSchedule(st.getId());
-                    return ResponseEntity.ok(st);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(st.getGroupId(), u.getId()).get();
+        if(m != null){
+            if(m.getRoles().contains(MemberRole.ADMIN)){
+                st = scheduleTemplateRepository.save(st);
+                Scheduler.updateSchedule(st.getId());
+                return ResponseEntity.ok(st);
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -91,14 +89,13 @@ public class ScheduleTemplateController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
-        for(Member m : memberRepository.findMemberByGroupId(scheduleTemplate.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                if(m.getRoles().contains(MemberRole.ADMIN)){
-                    ScheduleTemplate st = scheduleTemplateRepository.save(new ScheduleTemplate(0, scheduleTemplate.getGroupId(), scheduleTemplate.getName(), scheduleTemplate.getTimeStart(), scheduleTemplate.getTimeStop()));
-                    return ResponseEntity.ok(st);
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(scheduleTemplate.getGroupId(), u.getId()).get();
+        if(m != null){
+            if(m.getRoles().contains(MemberRole.ADMIN)){
+                ScheduleTemplate st = scheduleTemplateRepository.save(new ScheduleTemplate(0, scheduleTemplate.getGroupId(), scheduleTemplate.getName(), scheduleTemplate.getTimeStart(), scheduleTemplate.getTimeStop()));
+                return ResponseEntity.ok(st);
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -109,15 +106,14 @@ public class ScheduleTemplateController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(id).get();
-        for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                if(m.getRoles().contains(MemberRole.ADMIN)){
-                    lessonTemplateRepository.deleteLessonTemplateByScheduleTemplateId(id);
-                    scheduleTemplateRepository.deleteById(id);
-                    return ResponseEntity.ok().build();
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Member m = memberRepository.findByGroupIdAndUserId(st.getGroupId(), u.getId()).get();
+        if(m != null){
+            if(m.getRoles().contains(MemberRole.ADMIN)){
+                lessonTemplateRepository.deleteLessonTemplateByScheduleTemplateId(id);
+                scheduleTemplateRepository.deleteById(id);
+                return ResponseEntity.ok().build();
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -141,10 +137,9 @@ public class ScheduleTemplateController {
         }
         if(auth.getAuthorities().contains(Role.ADMIN))
             return ResponseEntity.ok(ids);
-        for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
-            if(u.getId() == m.getUserId()){
-                return ResponseEntity.ok(ids);
-            }
+        Member m = memberRepository.findByGroupIdAndUserId(st.getGroupId(), u.getId()).get();
+        if(m != null){
+            return ResponseEntity.ok(ids);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
