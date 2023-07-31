@@ -1,0 +1,28 @@
+jwt:
+  secret:
+    refresh: zL1HB3Pch05Avfynovxrf/kpF9O2m4NCWKJUjEp27s9J2jEG3ifiKCGylaZ8fDeoONSTJP/wAzKawB8F9rOMNg==
+    access: qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==
+mail:
+  smtps:
+    password: password
+    auth: 'true'
+    host: smtp.gmail.com
+    user: mail@gmail.com
+  transport:
+    protocol: smtps
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: public
+    show-sql: 'true'
+    hibernate:
+      ddl-auto: update
+  datasource:
+    testWhileIdle: 'true'
+    password: '123'
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+    validationQuery: SELECT 1
