@@ -31,27 +31,27 @@ public class LessonTemplateController {
 
     @GetMapping("{id}")
     public ResponseEntity<LessonTemplate> get(@PathVariable("id") long id){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!lessonTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         LessonTemplate lt = lessonTemplateRepository.findById(id).get();
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(lt);
         ScheduleTemplate st = scheduleTemplateRepository.findById(lt.getScheduleTemplateId()).get();
         for(Member m : memberRepository.findMemberByGroupId(st.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 return ResponseEntity.ok(lt);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN))
-            return ResponseEntity.ok(lt);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PatchMapping("{id}")
     public ResponseEntity<LessonTemplate> patch(@PathVariable("id") long id, @RequestBody LessonTemplate lessonTemplate){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!lessonTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         LessonTemplate lt = lessonTemplateRepository.findById(id).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(lt.getScheduleTemplateId()).get();
@@ -73,7 +73,6 @@ public class LessonTemplateController {
     }
     @PostMapping("create")
     public ResponseEntity<LessonTemplate> create(@RequestBody LessonTemplate lessonTemplate){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (lessonTemplate.getTime() == 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if (lessonTemplate.getScheduleTemplateId() == 0)
@@ -84,6 +83,7 @@ public class LessonTemplateController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         if(!customLessonRepository.existsById(lessonTemplate.getLessonId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(lessonTemplate.getScheduleTemplateId()).get();
         LessonTemplate lt = new LessonTemplate(0, lessonTemplate.getScheduleTemplateId(), lessonTemplate.getLessonId(), lessonTemplate.getTime());
@@ -101,9 +101,9 @@ public class LessonTemplateController {
     }
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") long id){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!lessonTemplateRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         LessonTemplate lt = lessonTemplateRepository.findById(id).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(lt.getScheduleTemplateId()).get();

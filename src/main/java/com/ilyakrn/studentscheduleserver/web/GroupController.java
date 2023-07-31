@@ -31,26 +31,26 @@ public class GroupController {
 
     @GetMapping("{id}")
     public ResponseEntity<Group> get(@PathVariable("id") long id){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         Group g = groupRepository.findById(id).get();
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(g);
         for(Member m : memberRepository.findMemberByGroupId(g.getId()).get()){
             if(u.getId() == m.getUserId()){
                 return ResponseEntity.ok(g);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN))
-            return ResponseEntity.ok(g);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PatchMapping("{id}")
     public ResponseEntity<Group> patch(@PathVariable("id") long id, @RequestBody Group group){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         Group g = groupRepository.findById(id).get();
         if (group.getName() != null)
@@ -70,9 +70,9 @@ public class GroupController {
 
     @PostMapping("create")
     public ResponseEntity<Group> create(@RequestBody Group group){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (group.getName() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         Group g = groupRepository.save(new Group(0, 0, group.getName()));
         ArrayList<MemberRole> roles = new ArrayList<>();

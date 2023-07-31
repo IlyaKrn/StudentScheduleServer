@@ -37,19 +37,19 @@ public class SpecificLessonMediaController {
 
     @GetMapping("{id}")
     public ResponseEntity<SpecificLessonMedia> get(@PathVariable("id") long id){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!specificLessonMediaRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         SpecificLessonMedia slm = specificLessonMediaRepository.findById(id).get();
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(slm);
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
         for(Member m : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 return ResponseEntity.ok(slm);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN))
-            return ResponseEntity.ok(slm);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     @PostMapping("create")
@@ -58,9 +58,9 @@ public class SpecificLessonMediaController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if (specificLessonMedia.getUrl() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!specificLessonRepository.existsById(specificLessonMedia.getSpecificLessonId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         SpecificLessonMedia slm = new SpecificLessonMedia(0, u.getId(), specificLessonMedia.getSpecificLessonId(), specificLessonMedia.getUrl());
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
@@ -74,6 +74,8 @@ public class SpecificLessonMediaController {
     }
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") long id){
+        if(!specificLessonMediaRepository.existsById(id))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         SpecificLessonMedia slm = specificLessonMediaRepository.findById(id).get();
@@ -85,9 +87,9 @@ public class SpecificLessonMediaController {
     }
     @GetMapping("{id}/specificLessonMediaComments")
     public ResponseEntity<ArrayList<Long>> specificLessonMediaComments(@PathVariable("id") long id){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!specificLessonMediaRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         SpecificLessonMedia slm = specificLessonMediaRepository.findById(id).get();
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
@@ -96,13 +98,13 @@ public class SpecificLessonMediaController {
         for (SpecificLessonMediaComment slmc : slmcs){
             ids.add(slmc.getId());
         }
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(ids);
         for(Member m : memberRepository.findMemberByGroupId(sl.getGroupId()).get()){
             if(u.getId() == m.getUserId()){
                 return ResponseEntity.ok(ids);
             }
         }
-        if(auth.getAuthorities().contains(Role.ADMIN))
-            return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
