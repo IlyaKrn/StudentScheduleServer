@@ -26,6 +26,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.sun.mail:javax.mail:1.6.2'
+	implementation 'commons-io:commons-io:2.7'
 	implementation 'org.flywaydb:flyway-core'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
