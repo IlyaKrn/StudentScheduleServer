@@ -5,6 +5,7 @@
 CREATE TABLE IF NOT EXISTS public.users
 (
     id bigint NOT NULL,
+    ava character varying(255) COLLATE pg_catalog."default",
     banned boolean NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
     first_name character varying(255) COLLATE pg_catalog."default" NOT NULL,

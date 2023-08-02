@@ -57,7 +57,7 @@ public class SpecificLessonMediaController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     @PostMapping("create")
-    public ResponseEntity<SpecificLessonMedia> create(@RequestBody SpecificLessonMedia specificLessonMedia, @RequestParam("file") MultipartFile file){
+    public ResponseEntity<SpecificLessonMedia> create(@RequestBody SpecificLessonMedia specificLessonMedia, @RequestParam("image") MultipartFile image){
         if (specificLessonMedia.getSpecificLessonId() == 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if (specificLessonMedia.getUrl() == null)
@@ -71,7 +71,7 @@ public class SpecificLessonMediaController {
         Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
         if(m != null){
             try {
-                fileService.post(file);
+                fileService.post(image);
             } catch (IOException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
