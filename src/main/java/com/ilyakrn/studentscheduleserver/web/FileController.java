@@ -20,7 +20,7 @@ public class FileController {
     @Autowired
     private FileService fileService;
 
-    @GetMapping("${id}")
+    @GetMapping("{id}")
     public ResponseEntity<Byte[]> get(@PathVariable("id") long id){
         File f = fileService.get("http://localhost:8080/api/files/" + id);
         if(f != null){

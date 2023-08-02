@@ -4,6 +4,7 @@ import com.ilyakrn.studentscheduleserver.web.models.VerifyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class VerifyService {
 
 
 
-    public void sendCode(String email){
+    public void sendCode(String email) throws MessagingException {
         long code = Math.round(Math.random() * 100000);
         mailService.sendSimpleMessage(email, "Verify email", String.valueOf(code));
         emailCodes.put(email, code);
@@ -28,7 +29,7 @@ public class VerifyService {
             emailCodes.remove(verifyRequest.getEmail());
             return true;
         }
-        return true; // temporally
+        return false;
     }
 
 }

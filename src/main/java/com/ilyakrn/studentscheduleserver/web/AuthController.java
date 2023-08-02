@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
 import javax.security.auth.message.AuthException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,7 +89,11 @@ public class AuthController {
             roles.add(Role.USER);
             User u = new User(0, authRequest.getEmail(), authRequest.getPassword(), authRequest.getFirstName(), authRequest.getLastName(), false, null, roles);
             verifyUserCache.put(u.getEmail(), u);
-            verifyService.sendCode(u.getEmail());
+            try {
+                verifyService.sendCode(u.getEmail());
+            } catch (MessagingException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
             return ResponseEntity.ok().build();
         }
         else {
