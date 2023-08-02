@@ -26,3 +26,5 @@ spring:
     username: postgres
     url: jdbc:postgresql://localhost:5432/postgres
     validationQuery: SELECT 1
+file:
+  root: files
