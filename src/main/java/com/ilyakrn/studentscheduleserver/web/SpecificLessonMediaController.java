@@ -2,13 +2,16 @@ package com.ilyakrn.studentscheduleserver.web;
 
 import com.ilyakrn.studentscheduleserver.data.repositories.*;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.*;
+import com.ilyakrn.studentscheduleserver.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 @RestController
@@ -33,6 +36,8 @@ public class SpecificLessonMediaController {
     private SpecificLessonMediaRepository specificLessonMediaRepository;
     @Autowired
     private SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
+    @Autowired
+    private FileService fileService;
 
 
     @GetMapping("{id}")
@@ -52,7 +57,7 @@ public class SpecificLessonMediaController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     @PostMapping("create")
-    public ResponseEntity<SpecificLessonMedia> create(@RequestBody SpecificLessonMedia specificLessonMedia){
+    public ResponseEntity<SpecificLessonMedia> create(@RequestBody SpecificLessonMedia specificLessonMedia, @RequestParam("file") MultipartFile file){
         if (specificLessonMedia.getSpecificLessonId() == 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if (specificLessonMedia.getUrl() == null)
@@ -65,6 +70,11 @@ public class SpecificLessonMediaController {
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
         Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
         if(m != null){
+            try {
+                fileService.post(file);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
             slm = specificLessonMediaRepository.save(slm);
             return ResponseEntity.ok(slm);
         }
@@ -81,6 +91,7 @@ public class SpecificLessonMediaController {
         Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
         if(m != null){
             if(slm.getUserId() == u.getId()){
+                fileService.delete(slm.getUrl());
                 specificLessonMediaRepository.delete(slm);
                 specificLessonMediaCommentRepository.deleteByMediaId(slm.getId());
             }
