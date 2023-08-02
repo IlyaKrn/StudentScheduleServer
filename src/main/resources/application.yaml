@@ -7,7 +7,7 @@ mail:
     password: password
     auth: 'true'
     host: smtp.gmail.com
-    user: mail@gmail.com
+    user: studschedapp@gmail.com
   transport:
     protocol: smtps
 spring:
