@@ -72,7 +72,7 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
-        Group g = groupRepository.save(new Group(0, 0, group.getName()));
+        Group g = groupRepository.save(new Group(0, 0, 0, group.getName()));
         ArrayList<MemberRole> roles = new ArrayList<>();
         roles.add(MemberRole.MEMBER);
         roles.add(MemberRole.ADMIN);

@@ -28,8 +28,8 @@ public class User {
     private String lastName;
     @Column(name = "banned", nullable = false)
     private Boolean banned;
-    @Column(name = "ava")
-    private String ava;
+    @Column(name = "ava_id")
+    private long avaId;
     @ElementCollection
     private List<Role> roles;
 

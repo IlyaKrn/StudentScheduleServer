@@ -15,12 +15,11 @@ public class FileService {
     @Value("${file.root}")
     private String root;
 
-    public File get(String url) {
-        long id = Long.parseLong(url.replace("http://localhost:8080/api/files/", ""));
+    public File get(long id) {
         return new File(root + "/" + id);
     }
 
-    public String post(MultipartFile file) throws IOException {
+    public long post(MultipartFile file) throws IOException {
         if (!file.isEmpty()) {
             try {
                 if(!new File(root).exists())
@@ -42,7 +41,7 @@ public class FileService {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(root + "/" + id)));
                 stream.write(bytes);
                 stream.close();
-                return "http://localhost:8080/api/files/" + id;
+                return id;
             } catch (Exception e) {
                 throw new IOException(e);
             }
@@ -50,8 +49,7 @@ public class FileService {
             throw new IOException();
         }
     }
-    public void delete(String  url){
-        long id = Long.parseLong(url.replace("http://localhost:8080/api/files/", ""));
+    public void delete(long  id){
         File f = new File(root + "/" + id);
         if (f.exists())
             f.delete();

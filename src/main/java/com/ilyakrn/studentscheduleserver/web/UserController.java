@@ -49,13 +49,20 @@ public class UserController {
         User u = userRepository.findById(id).get();
         if (image != null && auth.getName().equals(u.getEmail())) {
             try {
-                String ava = fileService.post(image);
-                u.setAva(ava);
+                long ava = fileService.post(image);
+                u.setAvaId(ava);
             } catch (IOException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
         }
         else if (image != null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        if (user.getAvaId() == -1 && auth.getName().equals(u.getEmail())){
+            fileService.delete(u.getAvaId());
+            u.setAvaId(0);
+        }
+        else if (user.getAvaId() == -1)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         if (user.getPassword() != null && auth.getName().equals(u.getEmail()))

@@ -87,7 +87,7 @@ public class AuthController {
         if(!userRepository.existsByEmail(authRequest.getEmail())){
             ArrayList<Role> roles = new ArrayList<>();
             roles.add(Role.USER);
-            User u = new User(0, authRequest.getEmail(), authRequest.getPassword(), authRequest.getFirstName(), authRequest.getLastName(), false, null, roles);
+            User u = new User(0, authRequest.getEmail(), authRequest.getPassword(), authRequest.getFirstName(), authRequest.getLastName(), false, 0, roles);
             verifyUserCache.put(u.getEmail(), u);
             try {
                 verifyService.sendCode(u.getEmail());

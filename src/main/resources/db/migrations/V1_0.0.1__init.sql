@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS public.users
 (
     id bigint NOT NULL,
-    ava character varying(255) COLLATE pg_catalog."default",
+    ava_id bigint,
     banned boolean NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
     first_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
@@ -65,8 +65,8 @@ ALTER TABLE IF EXISTS public.specific_lessons
 CREATE TABLE IF NOT EXISTS public.specific_lesson_medias
 (
     id bigint NOT NULL,
+    file_id bigint NOT NULL,
     specific_lesson_id bigint NOT NULL,
-    url character varying(255) COLLATE pg_catalog."default" NOT NULL,
     user_id bigint NOT NULL,
     CONSTRAINT specific_lesson_medias_pkey PRIMARY KEY (id)
 )
@@ -178,6 +178,7 @@ ALTER TABLE IF EXISTS public.lesson_templates
 CREATE TABLE IF NOT EXISTS public.groups
 (
     id bigint NOT NULL,
+    ava_id bigint NOT NULL,
     chat_id bigint NOT NULL,
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT groups_pkey PRIMARY KEY (id)

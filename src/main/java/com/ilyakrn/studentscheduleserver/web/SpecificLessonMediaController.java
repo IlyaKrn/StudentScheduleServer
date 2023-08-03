@@ -60,21 +60,21 @@ public class SpecificLessonMediaController {
     public ResponseEntity<SpecificLessonMedia> create(@RequestBody SpecificLessonMedia specificLessonMedia, @RequestParam("image") MultipartFile image){
         if (specificLessonMedia.getSpecificLessonId() == 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        if (specificLessonMedia.getUrl() == null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if (!specificLessonRepository.existsById(specificLessonMedia.getSpecificLessonId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
-        SpecificLessonMedia slm = new SpecificLessonMedia(0, u.getId(), specificLessonMedia.getSpecificLessonId(), specificLessonMedia.getUrl());
+        SpecificLessonMedia slm = new SpecificLessonMedia(0, u.getId(), specificLessonMedia.getSpecificLessonId(), 0);
         SpecificLesson sl = specificLessonRepository.findById(slm.getSpecificLessonId()).get();
         Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
         if(m != null){
+            long id = 0;
             try {
-                fileService.post(image);
+                id = fileService.post(image);
             } catch (IOException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
+            slm.setFileId(id);
             slm = specificLessonMediaRepository.save(slm);
             return ResponseEntity.ok(slm);
         }
@@ -91,7 +91,7 @@ public class SpecificLessonMediaController {
         Member m = memberRepository.findByGroupIdAndUserId(sl.getGroupId(), u.getId()).get();
         if(m != null){
             if(slm.getUserId() == u.getId()){
-                fileService.delete(slm.getUrl());
+                fileService.delete(slm.getFileId());
                 specificLessonMediaRepository.delete(slm);
                 specificLessonMediaCommentRepository.deleteByMediaId(slm.getId());
             }

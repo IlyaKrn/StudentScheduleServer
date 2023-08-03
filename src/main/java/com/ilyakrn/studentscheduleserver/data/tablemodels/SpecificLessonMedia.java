@@ -22,7 +22,7 @@ public class SpecificLessonMedia {
     private long userId;
     @Column(name = "specific_lesson_id", nullable = false)
     private long specificLessonId;
-    @Column(name = "url", nullable = false)
-    private String url;
+    @Column(name = "file_id", nullable = false)
+    private long fileId;
 
 }

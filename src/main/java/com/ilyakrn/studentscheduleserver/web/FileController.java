@@ -22,7 +22,7 @@ public class FileController {
 
     @GetMapping("{id}")
     public ResponseEntity<Byte[]> get(@PathVariable("id") long id){
-        File f = fileService.get("http://localhost:8080/api/files/" + id);
+        File f = fileService.get(id);
         if(f != null){
             try {
                 byte[] bs = FileUtils.readFileToByteArray(f);
