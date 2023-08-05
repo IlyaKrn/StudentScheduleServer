@@ -92,7 +92,7 @@ public class CustomLessonController {
     }
     @GetMapping("{id}/lessonTemplates")
     public ResponseEntity<ArrayList<Long>> lessonTemplates(@PathVariable("id") long id){
-        if(!lessonTemplateRepository.existsById(id))
+        if(!customLessonRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
@@ -118,7 +118,7 @@ public class CustomLessonController {
     }
     @GetMapping("{id}/specificLessons")
     public ResponseEntity<ArrayList<Long>> specificLessons(@PathVariable("id") long id){
-        if(!specificLessonRepository.existsById(id))
+        if(!customLessonRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
