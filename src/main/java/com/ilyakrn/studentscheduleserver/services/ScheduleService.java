@@ -1,4 +1,4 @@
-package com.ilyakrn.studentscheduleserver.web.util;
+package com.ilyakrn.studentscheduleserver.services;
 
 import com.ilyakrn.studentscheduleserver.data.repositories.*;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.LessonTemplate;
@@ -6,29 +6,31 @@ import com.ilyakrn.studentscheduleserver.data.tablemodels.ScheduleTemplate;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.SpecificLesson;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.SpecificLessonMedia;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class Scheduler {
+@Service
+public class ScheduleService {
     private static final long WEEK_LENGTH = 604800000L;
     private static final SimpleDateFormat format = new SimpleDateFormat("dd HH:mm");
 
 
     @Autowired
-    private static LessonTemplateRepository lessonTemplateRepository;
+    private LessonTemplateRepository lessonTemplateRepository;
     @Autowired
-    private static SpecificLessonRepository specificLessonRepository;
+    private SpecificLessonRepository specificLessonRepository;
     @Autowired
-    private static ScheduleTemplateRepository scheduleTemplateRepository;
+    private ScheduleTemplateRepository scheduleTemplateRepository;
     @Autowired
-    private static SpecificLessonMediaRepository specificLessonMediaRepository;
+    private SpecificLessonMediaRepository specificLessonMediaRepository;
     @Autowired
-    private static SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
+    private SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
 
-    private static ArrayList<SpecificLesson> scheduleLessons(long startTimestamp, long endTimestamp, List<LessonTemplate> schedule, long groupId) {
+    private ArrayList<SpecificLesson> scheduleLessons(long startTimestamp, long endTimestamp, List<LessonTemplate> schedule, long groupId) {
         final Calendar weekStartCalendar = Calendar.getInstance();
         weekStartCalendar.setTimeInMillis(startTimestamp);
         weekStartCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
@@ -53,7 +55,7 @@ public class Scheduler {
         return generatedLessons;
     }
 
-    public static void updateSchedule(long scheduleId){
+    public void updateSchedule(long scheduleId){
         ScheduleTemplate st = scheduleTemplateRepository.findById(scheduleId).get();
         ArrayList<LessonTemplate> lts = (ArrayList<LessonTemplate>) lessonTemplateRepository.findLessonTemplateByScheduleTemplateId(st.getId()).get();
         ArrayList<SpecificLesson> sls = scheduleLessons(st.getTimeStart(), st.getTimeStop(), lts, st.getGroupId());
@@ -73,20 +75,4 @@ public class Scheduler {
         }
     }
 
-  //  public static void main(String[] args) {
-  //      ArrayList<LessonTemplate> schedule = new ArrayList<>();
-  //      // Получаем расписание в формате UTC +0
-  //      schedule.add(new LessonTemplate(0, 0L, 1L, 49802000L));
-  //      schedule.add(new LessonTemplate(0, 0L, 2L, 138002000L));
-  //      schedule.add(new LessonTemplate(0, 0L, 3L, 217202000L));
-  //      schedule.add(new LessonTemplate(0, 0L, 4L, 297302000L));
-  //      schedule.add(new LessonTemplate(0, 0L, 5L, 380102000L));
-//
-  //      // Выдаем распределенное расписание в формате UTC +0
-  //      Scheduler s = new Scheduler();
-  //      List<SpecificLesson> result = s.scheduleLessons(1691366342000L, schedule,1L);
-  //      for (SpecificLesson lesson: result) {
-  //          System.out.println(format.format(lesson.getTime()) + " " + lesson.getLessonId());
-  //      }
-  //  }
 }

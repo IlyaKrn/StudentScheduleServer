@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("api/members")
@@ -19,7 +20,9 @@ public class MemberController {
 
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
     private GroupRepository groupRepository;
 
     @GetMapping("{id}")

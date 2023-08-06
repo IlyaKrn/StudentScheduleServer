@@ -2,7 +2,7 @@ package com.ilyakrn.studentscheduleserver.web;
 
 import com.ilyakrn.studentscheduleserver.data.repositories.*;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.*;
-import com.ilyakrn.studentscheduleserver.web.util.Scheduler;
+import com.ilyakrn.studentscheduleserver.services.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +36,8 @@ public class ScheduleTemplateController {
     private SpecificLessonMediaCommentRepository specificLessonMediaCommentRepository;
     @Autowired
     private GroupRepository groupRepository;
+    @Autowired
+    private ScheduleService scheduleService;
 
     @GetMapping("{id}")
     public ResponseEntity<ScheduleTemplate> get(@PathVariable("id") long id){
@@ -70,7 +72,7 @@ public class ScheduleTemplateController {
         if(m != null){
             if(m.getRoles().contains(MemberRole.ADMIN)){
                 st = scheduleTemplateRepository.save(st);
-                Scheduler.updateSchedule(st.getId());
+                scheduleService.updateSchedule(st.getId());
                 return ResponseEntity.ok(st);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -110,6 +112,7 @@ public class ScheduleTemplateController {
         if(m != null){
             if(m.getRoles().contains(MemberRole.ADMIN)){
                 lessonTemplateRepository.deleteLessonTemplateByScheduleTemplateId(id);
+                scheduleService.updateSchedule(st.getId());
                 scheduleTemplateRepository.deleteById(id);
                 return ResponseEntity.ok().build();
             }

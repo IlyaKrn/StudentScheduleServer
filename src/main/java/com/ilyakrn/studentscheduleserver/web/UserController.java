@@ -41,6 +41,14 @@ public class UserController {
 
     }
 
+    @GetMapping("me")
+    public ResponseEntity<User> get(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        return ResponseEntity.ok(u);
+
+    }
+
     @PatchMapping("{id}")
     public ResponseEntity<User> patch(@PathVariable("id") long id, @RequestBody User user, @RequestParam(value = "image", required = false) MultipartFile image){
         if(!userRepository.existsById(id))
@@ -50,6 +58,8 @@ public class UserController {
         if (image != null && auth.getName().equals(u.getEmail())) {
             try {
                 long ava = fileService.post(image);
+                if(u.getAvaId() != 0)
+                    fileService.delete(u.getAvaId());
                 u.setAvaId(ava);
             } catch (IOException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -59,7 +69,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         if (user.getAvaId() == -1 && auth.getName().equals(u.getEmail())){
-            fileService.delete(u.getAvaId());
+            if(u.getAvaId() != 0)
+                fileService.delete(u.getAvaId());
             u.setAvaId(0);
         }
         else if (user.getAvaId() == -1)

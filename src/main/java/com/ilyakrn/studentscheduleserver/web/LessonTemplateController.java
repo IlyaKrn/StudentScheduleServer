@@ -2,7 +2,7 @@ package com.ilyakrn.studentscheduleserver.web;
 
 import com.ilyakrn.studentscheduleserver.data.repositories.*;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.*;
-import com.ilyakrn.studentscheduleserver.web.util.Scheduler;
+import com.ilyakrn.studentscheduleserver.services.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +28,8 @@ public class LessonTemplateController {
     private SpecificLessonRepository specificLessonRepository;
     @Autowired
     private ScheduleTemplateRepository scheduleTemplateRepository;
+    @Autowired
+    private ScheduleService scheduleService;
 
     @GetMapping("{id}")
     public ResponseEntity<LessonTemplate> get(@PathVariable("id") long id){
@@ -62,7 +64,7 @@ public class LessonTemplateController {
         if(m != null){
             if(m.getRoles().contains(MemberRole.ADMIN)){
                 lt = lessonTemplateRepository.save(lt);
-                Scheduler.updateSchedule(st.getId());
+                scheduleService.updateSchedule(st.getId());
                 return ResponseEntity.ok(lt);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -77,7 +79,7 @@ public class LessonTemplateController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         if (lessonTemplate.getLessonId() == 0)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        if(!scheduleTemplateRepository.existsById(lessonTemplate.getId()))
+        if(!scheduleTemplateRepository.existsById(lessonTemplate.getScheduleTemplateId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         if(!customLessonRepository.existsById(lessonTemplate.getLessonId()))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -89,7 +91,7 @@ public class LessonTemplateController {
         if(m != null){
             if(m.getRoles().contains(MemberRole.ADMIN)){
                 lt = lessonTemplateRepository.save(lt);
-                Scheduler.updateSchedule(st.getId());
+                scheduleService.updateSchedule(st.getId());
                 return ResponseEntity.ok(lt);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -108,7 +110,7 @@ public class LessonTemplateController {
         if(m != null){
             if(m.getRoles().contains(MemberRole.ADMIN)){
                 lessonTemplateRepository.delete(lt);
-                Scheduler.updateSchedule(st.getId());
+                scheduleService.updateSchedule(st.getId());
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -25,7 +25,7 @@ public class VerifyService {
     }
 
     public boolean verify(VerifyRequest verifyRequest){
-        if(emailCodes.get(verifyRequest.getEmail()).equals(verifyRequest.getCode())){
+        if(emailCodes.get(verifyRequest.getEmail()) != null && emailCodes.get(verifyRequest.getEmail()).equals(verifyRequest.getCode())){
             emailCodes.remove(verifyRequest.getEmail());
             return true;
         }

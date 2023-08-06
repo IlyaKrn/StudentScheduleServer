@@ -2,13 +2,16 @@ package com.ilyakrn.studentscheduleserver.web;
 
 import com.ilyakrn.studentscheduleserver.data.repositories.*;
 import com.ilyakrn.studentscheduleserver.data.tablemodels.*;
+import com.ilyakrn.studentscheduleserver.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -28,6 +31,8 @@ public class GroupController {
     private ScheduleTemplateRepository scheduleTemplateRepository;
     @Autowired
     private SpecificLessonRepository specificLessonRepository;
+    @Autowired
+    private FileService fileService;
 
     @GetMapping("{id}")
     public ResponseEntity<Group> get(@PathVariable("id") long id){
@@ -46,7 +51,7 @@ public class GroupController {
     }
 
     @PatchMapping("{id}")
-    public ResponseEntity<Group> patch(@PathVariable("id") long id, @RequestBody Group group){
+    public ResponseEntity<Group> patch(@PathVariable("id") long id, @RequestBody Group group, @RequestParam(value = "image", required = false) MultipartFile image){
         if(!groupRepository.existsById(id))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -57,6 +62,16 @@ public class GroupController {
         Member m = memberRepository.findByGroupIdAndUserId(g.getId(), u.getId()).get();
         if(m != null){
             if(m.getRoles().contains(MemberRole.ADMIN)){
+                if (image != null) {
+                    try {
+                        long ava = fileService.post(image);
+                        if(u.getAvaId() != 0)
+                            fileService.delete(u.getAvaId());
+                        u.setAvaId(ava);
+                    } catch (IOException e) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                    }
+                }
                 g = groupRepository.save(g);
                 return ResponseEntity.ok(g);
             }
