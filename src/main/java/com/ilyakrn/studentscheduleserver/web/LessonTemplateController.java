@@ -10,6 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 @RestController
 @RequestMapping("api/lessonTemplates")
 public class LessonTemplateController {
@@ -115,6 +118,26 @@ public class LessonTemplateController {
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("list")
+    public ResponseEntity<ArrayList<Long>> list(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<LessonTemplate> lts = (ArrayList<LessonTemplate>) lessonTemplateRepository.findAll();
+        lts.sort(new Comparator<LessonTemplate>() {
+            @Override
+            public int compare(LessonTemplate o1, LessonTemplate o2) {
+                return -1 * Long.compare(o1.getScheduleTemplateId(), o2.getScheduleTemplateId());
+            }
+        });
+        ArrayList<Long> ids = new ArrayList<>();
+        for (LessonTemplate lt : lts){
+            ids.add(lt.getId());
+        }
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

@@ -9,6 +9,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 @RestController
 @RequestMapping("api/specificLessonMediaComments")
 public class SpecificLessonMediaCommentController {
@@ -116,6 +119,25 @@ public class SpecificLessonMediaCommentController {
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    @GetMapping("list")
+    public ResponseEntity<ArrayList<Long>> list(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<SpecificLessonMediaComment> slmcs = (ArrayList<SpecificLessonMediaComment>) specificLessonMediaCommentRepository.findAll();
+        slmcs.sort(new Comparator<SpecificLessonMediaComment>() {
+            @Override
+            public int compare(SpecificLessonMediaComment o1, SpecificLessonMediaComment o2) {
+                return -1 * Long.compare(o1.getUserId(), o2.getUserId());
+            }
+        });
+        ArrayList<Long> ids = new ArrayList<>();
+        for (SpecificLessonMediaComment slmc : slmcs){
+            ids.add(slmc.getId());
+        }
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

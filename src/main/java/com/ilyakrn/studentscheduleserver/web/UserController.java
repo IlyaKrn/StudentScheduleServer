@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 @RestController
 @RequestMapping("api/users")
@@ -152,6 +153,25 @@ public class UserController {
             return ResponseEntity.ok(ids);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
+    }
+    @GetMapping("list")
+    public ResponseEntity<ArrayList<Long>> list(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<User> us = (ArrayList<User>) userRepository.findAll();
+        us.sort(new Comparator<User>() {
+            @Override
+            public int compare(User o1, User o2) {
+                return -1 * Long.compare(o1.getId(), o2.getId());
+            }
+        });
+        ArrayList<Long> ids = new ArrayList<>();
+        for (User usr : us){
+            ids.add(usr.getId());
+        }
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(ids);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
 }

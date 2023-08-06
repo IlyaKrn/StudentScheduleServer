@@ -146,5 +146,24 @@ public class ScheduleTemplateController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+    @GetMapping("list")
+    public ResponseEntity<ArrayList<Long>> list(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<ScheduleTemplate> sts = (ArrayList<ScheduleTemplate>) scheduleTemplateRepository.findAll();
+        sts.sort(new Comparator<ScheduleTemplate>() {
+            @Override
+            public int compare(ScheduleTemplate o1, ScheduleTemplate o2) {
+                return -1 * Long.compare(o1.getGroupId(), o2.getGroupId());
+            }
+        });
+        ArrayList<Long> ids = new ArrayList<>();
+        for (ScheduleTemplate st : sts){
+            ids.add(st.getId());
+        }
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(ids);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
 }

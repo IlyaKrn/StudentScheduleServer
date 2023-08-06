@@ -87,5 +87,24 @@ public class SpecificLessonController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+    @GetMapping("list")
+    public ResponseEntity<ArrayList<Long>> list(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<SpecificLesson> sls = (ArrayList<SpecificLesson>) specificLessonRepository.findAll();
+        sls.sort(new Comparator<SpecificLesson>() {
+            @Override
+            public int compare(SpecificLesson o1, SpecificLesson o2) {
+                return -1 * Long.compare(o1.getGroupId(), o2.getGroupId());
+            }
+        });
+        ArrayList<Long> ids = new ArrayList<>();
+        for (SpecificLesson sl : sls){
+            ids.add(sl.getId());
+        }
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(ids);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
 }

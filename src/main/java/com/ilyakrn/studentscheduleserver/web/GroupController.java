@@ -188,6 +188,25 @@ public class GroupController {
 
     }
 
+    @GetMapping("list")
+    public ResponseEntity<ArrayList<Long>> list(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<Group> gs = (ArrayList<Group>) groupRepository.findAll();
+        gs.sort(new Comparator<Group>() {
+            @Override
+            public int compare(Group o1, Group o2) {
+                return -1 * Long.compare(o1.getId(), o2.getId());
+            }
+        });
+        ArrayList<Long> ids = new ArrayList<>();
+        for (Group g : gs){
+            ids.add(g.getId());
+        }
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(ids);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
 
 

@@ -124,5 +124,24 @@ public class MemberController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+    @GetMapping("list")
+    public ResponseEntity<ArrayList<Long>> list(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User u = userRepository.findByEmail(auth.getName()).get();
+        ArrayList<Member> ms = (ArrayList<Member>) memberRepository.findAll();
+        ms.sort(new Comparator<Member>() {
+            @Override
+            public int compare(Member o1, Member o2) {
+                return -1 * Long.compare(o1.getGroupId(), o2.getGroupId());
+            }
+        });
+        ArrayList<Long> ids = new ArrayList<>();
+        for (Member m : ms){
+            ids.add(m.getId());
+        }
+        if(auth.getAuthorities().contains(Role.ADMIN))
+            return ResponseEntity.ok(ids);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
 }
