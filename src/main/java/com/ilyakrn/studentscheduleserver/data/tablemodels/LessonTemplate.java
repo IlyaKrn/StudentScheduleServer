@@ -23,5 +23,7 @@ public class LessonTemplate {
     private long lessonId;
     @Column(name = "time", nullable = false)
     private long time;
+    @Column(name = "comment")
+    private String comment;
 
 }

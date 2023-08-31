@@ -47,7 +47,7 @@ public class ScheduleService {
                 if (lessonTime < startTimestamp) continue;
                 if (lessonTime > endTimestamp) break;
                 SpecificLesson newLesson = new SpecificLesson(0, groupId, lesson.getLessonId(),
-                        lessonTime, false);
+                        lessonTime, false, lesson.getComment());
                 generatedLessons.add(newLesson);
             }
             week++;

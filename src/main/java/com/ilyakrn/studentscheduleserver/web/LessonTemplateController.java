@@ -89,7 +89,7 @@ public class LessonTemplateController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User u = userRepository.findByEmail(auth.getName()).get();
         ScheduleTemplate st = scheduleTemplateRepository.findById(lessonTemplate.getScheduleTemplateId()).get();
-        LessonTemplate lt = new LessonTemplate(0, lessonTemplate.getScheduleTemplateId(), lessonTemplate.getLessonId(), lessonTemplate.getTime());
+        LessonTemplate lt = new LessonTemplate(0, lessonTemplate.getScheduleTemplateId(), lessonTemplate.getLessonId(), lessonTemplate.getTime(), lessonTemplate.getComment());
         Member m = memberRepository.findByGroupIdAndUserId(st.getGroupId(), u.getId()).get();
         if(m != null){
             if(m.getRoles().contains(MemberRole.ADMIN)){

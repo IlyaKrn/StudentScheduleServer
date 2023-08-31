@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS public.specific_lessons
 (
     id bigint NOT NULL,
     canceled boolean NOT NULL,
+    comment character varying(255) COLLATE pg_catalog."default",
     group_id bigint NOT NULL,
     lesson_id bigint NOT NULL,
     "time" bigint NOT NULL,
@@ -103,6 +104,7 @@ ALTER TABLE IF EXISTS public.specific_lesson_media_comments
 CREATE TABLE IF NOT EXISTS public.schedule_templates
 (
     id bigint NOT NULL,
+    comment character varying(255) COLLATE pg_catalog."default",
     group_id bigint NOT NULL,
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     time_start bigint NOT NULL,
@@ -155,10 +157,10 @@ ALTER TABLE IF EXISTS public.member_roles
 -- Table: public.lesson_templates
 
 -- DROP TABLE IF EXISTS public.lesson_templates;
-
 CREATE TABLE IF NOT EXISTS public.lesson_templates
 (
     id bigint NOT NULL,
+    comment character varying(255) COLLATE pg_catalog."default",
     lesson_id bigint NOT NULL,
     schedule_template_id bigint NOT NULL,
     "time" bigint NOT NULL,

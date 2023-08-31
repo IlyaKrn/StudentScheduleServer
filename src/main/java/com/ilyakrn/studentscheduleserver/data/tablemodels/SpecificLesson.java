@@ -25,5 +25,7 @@ public class SpecificLesson {
     private long time;
     @Column(name = "canceled", nullable = false)
     private Boolean canceled;
+    @Column(name = "comment")
+    private String comment;
 
 }

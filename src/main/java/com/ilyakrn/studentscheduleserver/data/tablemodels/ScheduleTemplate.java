@@ -25,5 +25,7 @@ public class ScheduleTemplate {
     private long timeStart;
     @Column(name = "time_stop", nullable = false)
     private long timeStop;
+    @Column(name = "comment")
+    private String comment;
 
 }

@@ -94,7 +94,7 @@ public class ScheduleTemplateController {
         Member m = memberRepository.findByGroupIdAndUserId(scheduleTemplate.getGroupId(), u.getId()).get();
         if(m != null){
             if(m.getRoles().contains(MemberRole.ADMIN)){
-                ScheduleTemplate st = scheduleTemplateRepository.save(new ScheduleTemplate(0, scheduleTemplate.getGroupId(), scheduleTemplate.getName(), scheduleTemplate.getTimeStart(), scheduleTemplate.getTimeStop()));
+                ScheduleTemplate st = scheduleTemplateRepository.save(new ScheduleTemplate(0, scheduleTemplate.getGroupId(), scheduleTemplate.getName(), scheduleTemplate.getTimeStart(), scheduleTemplate.getTimeStop(), scheduleTemplate.getComment()));
                 return ResponseEntity.ok(st);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
